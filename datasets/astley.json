@@ -1,0 +1,106 @@
+{
+  "count": 24,
+  "name": "Never Gonna Give You Up",
+  "children": [
+    {
+      "count": 9,
+      "name": "Never gonna",
+      "children": [
+        {
+          "count": 3,
+          "name": "give",
+          "children": [
+            {
+              "count": 1,
+              "name": "you up"
+            },
+            {
+              "count": 1,
+              "name": ", never gonna give"
+            }
+          ]
+        },
+        {
+          "count": 1,
+          "name": "let you down"
+        },
+        {
+          "count": 1,
+          "name": "make you cry"
+        },
+        {
+          "count": 1,
+          "name": "run around and desert you"
+        },
+        {
+          "count": 1,
+          "name": "say goodbye"
+        },
+        {
+          "count": 1,
+          "name": "tell a lie and hurt you"
+        }
+      ]
+    },
+    {
+      "count": 4,
+      "name": "We",
+      "children": [
+        {
+          "count": 1,
+          "name": "'re no strangers to love"
+        },
+        {
+          "count": 1,
+          "name": "'ve known each other for so long"
+        },
+        {
+          "count": 1,
+          "name": "know the game and we're gonna play it"
+        }
+      ]
+    },
+    {
+      "count": 3,
+      "name": "You",
+      "children": [
+        {
+          "count": 1,
+          "name": "know the rules and so do I"
+        },
+        {
+          "count": 1,
+          "name": "wouldn't get this from any other guy"
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "A full commitment's what I'm thinking of"
+    },
+    {
+      "count": 1,
+      "name": "And if you ask me how I'm feeling"
+    },
+    {
+      "count": 1,
+      "name": "Don't tell me you're too blind to see"
+    },
+    {
+      "count": 1,
+      "name": "Gotta make you understand"
+    },
+    {
+      "count": 1,
+      "name": "I just wanna tell you how I'm feeling"
+    },
+    {
+      "count": 1,
+      "name": "Inside we both know what's been going on"
+    },
+    {
+      "count": 1,
+      "name": "Your heart's been aching but you're too shy to say it"
+    }
+  ]
+}

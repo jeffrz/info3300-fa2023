@@ -1,0 +1,84 @@
+body {
+  font-family: 'Lato', 'Helvetica', sans-serif;
+  font-weight: 400;
+  margin: 20px;
+}
+h1, h2, h3, h4, h5 {
+  font-family: 'Raleway', 'Helvetica', sans-serif;
+  font-weight: 700;
+}
+h5 {
+  margin: 0;
+  padding-top: 50px;
+}
+.container {
+  max-width: 768px;
+}
+.larger {
+  max-width: 1200px;
+}
+.larger-font {
+  font-size: medium;
+}
+.lecture:after {
+    content: " \25CA";
+    margin-right: 6px;
+}
+.coding:after {
+    content: " \A4";
+    margin-right: 6px;
+}
+.sync:after {
+    content: " \2021";
+    margin-right: 6px;
+}
+.syncplus:after {
+    content: " \39E";
+    margin-right: 6px;
+}
+.doc-section {
+  padding: 2rem 0;
+  border-top: 1px solid #eee;
+  margin-bottom: 0
+}
+.fixed-cell {
+  min-width: 60px;
+  max-width: 150px;
+}
+.online .fixed-cell {
+  max-width: 120px;
+}
+.schedule tr td:first-child {
+  font-weight: bold;
+}
+tr.week-label {
+    border-bottom: 3px double #AAA;
+}
+.online tr.week-label td {
+  font-weight: bold;
+}
+.online tr.week-label td:first-child {
+  width: 80px;
+  padding-left:20px;
+}
+#legend {
+  margin: 0 0 0 20px;
+}
+#legend td {
+  border: 0;
+}
+td.paper-title {
+  max-width: 500px;
+}
+.narrow-list {
+  margin: 0 120px 0 20px;
+}
+
+pre > code {
+  /* Thanks https://www.longren.io/wrapping-text-inside-pre-tags/ */
+  white-space: pre-wrap;       /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}

@@ -1,0 +1,183 @@
+nation,date,Region,Total Population,GDP/Person (PPP$),Life Expectancy
+Canada,2010,America,"34,016,593",35219.34297,80.986
+Fiji,2010,East Asia & Pacific,"860,623",4074.620261,69.258
+Turkmenistan,2010,Europe & Central Asia,"5,041,995",6427.023204,65
+Serbia and Montenegro,2010,Europe & Central Asia,,,
+Lithuania,2010,Europe & Central Asia,"3,323,611",15408.12507,71.631
+Cambodia,2010,East Asia & Pacific,"14,138,255",1858.477823,70.811
+Ethiopia,2010,Sub-Saharan Africa,"82,949,541",871.8371156,61.486
+"Yemen, Rep.",2010,Middle East & North Africa,"24,052,514",2418.761076,62.536
+Swaziland,2010,Sub-Saharan Africa,"1,186,056",5163.288425,48.398
+Argentina,2010,America,"40,412,376",14486.6366,75.772
+Bolivia,2010,America,"9,929,849",4095.214842,66.362
+Cameroon,2010,Sub-Saharan Africa,"19,598,889",2017.815915,53.718
+Burkina Faso,2010,Sub-Saharan Africa,"16,468,714",1277.686645,55.081
+Bahrain,2010,Middle East & North Africa,"1,261,835",24012.80725,76.203
+Saudi Arabia,2010,Middle East & North Africa,"27,448,086",23841.28888,74.832
+Cape Verde,2010,Sub-Saharan Africa,"495,999",3655.839336,74.094
+Slovenia,2010,Europe & Central Asia,"2,029,680",24515.9774,79.125
+Guatemala,2010,America,"14,388,929",5181.687337,71.1
+Bosnia and Herzegovina,2010,Europe & Central Asia,"3,760,149",7596.007881,75.898
+Kuwait,2010,Middle East & North Africa,"2,736,732",39766.96425,73.992
+Jordan,2010,Middle East & North Africa,"6,187,227",5201.959287,73.39
+"Congo, Rep.",2010,Sub-Saharan Africa,"4,042,899",4049.163661,57.229
+Spain,2010,Europe & Central Asia,"46,076,989",26779.63704,81.656
+Liberia,2010,Sub-Saharan Africa,"3,994,122",450.1173633,59.459
+Netherlands,2010,Europe & Central Asia,"16,612,988",36526.12179,80.621
+Paraguay,2010,America,"6,454,548",4508.385932,72.016
+Pakistan,2010,South Asia,"173,593,383",2614.772162,66.11
+Oman,2010,Middle East & North Africa,"2,782,435",29371.91689,75.721
+Tanzania,2010,Sub-Saharan Africa,"44,841,226",1229.299421,59.224
+Martinique,2010,America,"405,814",,80.71
+West Bank and Gaza,2010,Middle East & North Africa,"4,039,192",3934.957429,72.64
+Gabon,2010,Sub-Saharan Africa,"1,505,463",12542.54603,62.333
+New Zealand,2010,East Asia & Pacific,"4,368,136",24607.28417,80.67
+Jamaica,2010,America,"2,741,052",6892.469439,72.897
+Albania,2010,Europe & Central Asia,"3,204,284",6746.445312,76.78
+Slovak Republic,2010,Europe & Central Asia,"5,462,119",19794.74169,75.02
+Australia,2010,East Asia & Pacific,"22,268,384",34884.76376,82.091
+Uruguay,2010,America,"3,368,786",12097.77465,76.787
+India,2010,South Asia,"1,224,614,327",2961.17336,65.65
+Azerbaijan,2010,Europe & Central Asia,"9,187,783",9325.554448,70.518
+Lesotho,2010,Sub-Saharan Africa,"2,171,318",1801.349543,47.584
+Kenya,2010,Sub-Saharan Africa,"40,512,682",1471.325641,59.58
+Tajikistan,2010,Europe & Central Asia,"6,878,637",1768.095085,66.83
+Turkey,2010,Europe & Central Asia,"72,752,325",8556.033519,74.274
+Afghanistan,2010,South Asia,"31,411,743",1214.613653,59.612
+Ireland,2010,Europe & Central Asia,"4,469,900",35257.17453,80.151
+Eritrea,2010,Sub-Saharan Africa,"5,253,676",561.0500065,61.275
+Solomon Islands,2010,East Asia & Pacific,"538,148",1820.628849,67.027
+Lebanon,2010,Middle East & North Africa,"4,227,597",13657.99158,79.11
+French Polynesia,2010,East Asia & Pacific,"270,764",26564.31526,75.618
+France,2010,Europe & Central Asia,"62,787,427",29691.24163,81.35
+Rwanda,2010,Sub-Saharan Africa,"10,624,005",1094.057911,62.276
+Somalia,2010,Sub-Saharan Africa,"9,330,872",948.4843629,53
+Peru,2010,America,"29,076,512",8419.90566,73.912
+Laos,2010,East Asia & Pacific,"6,200,894",2466.641376,66.957
+Norway,2010,Europe & Central Asia,"4,883,111",46595.82113,81.064
+Malawi,2010,Sub-Saharan Africa,"14,900,841",844.4226901,53.536
+Benin,2010,Sub-Saharan Africa,"8,849,892",1438.986214,58.797
+Cuba,2010,America,"11,257,979",9626.113792,78.736
+Eritrea and Ethiopia,2010,Sub-Saharan Africa,,,
+Botswana,2010,Sub-Saharan Africa,"2,006,945",13181.34202,46.588
+Montenegro,2010,Europe & Central Asia,"631,490",9396.213038,74.489
+Togo,2010,Sub-Saharan Africa,"6,027,798",925.3900846,55.514
+China,2010,East Asia & Pacific,"1,341,335,152",8143.482408,74.868
+Armenia,2010,Europe & Central Asia,"3,092,072",4598.933383,74.291
+"Korea, United",2010,East Asia & Pacific,,,
+Ukraine,2010,Europe & Central Asia,"45,448,329",6022.477704,68.188
+Ghana,2010,Sub-Saharan Africa,"24,391,823",1485.657586,60.626
+Finland,2010,Europe & Central Asia,"5,364,546",31053.39703,79.987
+Libya,2010,Middle East & North Africa,"6,355,112",11842.3861,74.732
+Dominican Rep.,2010,America,"9,927,320",6663.746169,72.734
+Yemen Arab Republic (Former),2010,Middle East & North Africa,,,
+Indonesia,2010,East Asia & Pacific,"239,870,937",3982.910268,70.185
+Mauritius,2010,Sub-Saharan Africa,"1,299,172",12317.23559,73.142
+Sweden,2010,Europe & Central Asia,"9,379,687",33316.77213,81.426
+USSR,2010,Europe & Central Asia,,,
+Mali,2010,Sub-Saharan Africa,"15,369,809",1121.551629,53.788
+"Korea, Dem. Rep.",2010,East Asia & Pacific,"24,346,229",1548.619789,69.118
+Russia,2010,Europe & Central Asia,"142,958,164",14207.51818,67.622
+Bulgaria,2010,Europe & Central Asia,"7,494,332",10990.43751,73.243
+Yemen Democratic (Former),2010,Middle East & North Africa,,,
+United States,2010,America,"310,383,948",41230.56986,78.507
+Romania,2010,Europe & Central Asia,"21,486,371",10738.96394,73.476
+Angola,2010,Sub-Saharan Africa,"19,081,912",5497.618103,50.689
+Chad,2010,Sub-Saharan Africa,"11,227,208",1759.973441,49.794
+South Africa,2010,Sub-Saharan Africa,"50,132,817",9322.168814,54.547
+Nicaragua,2010,America,"5,788,163",2871.903509,73.84
+Malaysia,2010,East Asia & Pacific,"28,401,017",13185.43553,74.479
+Senegal,2010,Sub-Saharan Africa,"12,433,728",1740.515097,62.934
+Vietnam,2010,East Asia & Pacific,"87,848,445",2830.7757,75.49
+Mozambique,2010,Sub-Saharan Africa,"23,390,765",954.4875561,49.204
+Uganda,2010,Sub-Saharan Africa,"33,424,683",1219.457289,57.319
+Japan,2010,East Asia & Pacific,"126,535,920",30731.99257,83.092
+Niger,2010,Sub-Saharan Africa,"15,511,953",661.1771297,56.956
+Brazil,2010,America,"194,946,470",10195.44815,73.121
+Guinea,2010,Sub-Saharan Africa,"9,981,590",939.3718791,55.317
+Panama,2010,America,"3,516,820",11494.67388,76.916
+Guyana,2010,America,"754,493",3937.588619,65.775
+Luxembourg,2010,Europe & Central Asia,"507,448",70402.8428,80.004
+West Germany,2010,Europe & Central Asia,,,
+Nigeria,2010,Sub-Saharan Africa,"158,423,182",2297.341367,51.297
+Serbia excluding Kosovo,2010,Europe & Central Asia,,,
+Ecuador,2010,America,"14,464,739",7182.70775,75.647
+Bangladesh,2010,South Asia,"148,692,131",1621.048571,69.449
+Belarus,2010,Europe & Central Asia,"9,595,421",12490.18818,69.613
+Iran,2010,Middle East & North Africa,"73,973,630",12483.19957,73.094
+Algeria,2010,Middle East & North Africa,"35,468,208",6300.648214,70.615
+El Salvador,2010,America,"6,192,993",5677.271041,71.88
+Chile,2010,America,"17,113,688",14038.37229,79.168
+Puerto Rico,2010,America,"3,749,009",18517.9079,78.326
+Belgium,2010,Europe & Central Asia,"10,712,066",32832.33518,80.007
+Thailand,2010,East Asia & Pacific,"69,122,234",7996.075059,73.852
+Haiti,2010,America,"9,993,247",1148.748227,45
+Iraq,2010,Middle East & North Africa,"31,671,591",3760.811656,68.753
+Sierra Leone,2010,Sub-Saharan Africa,"5,867,536",889.5818389,44.846
+Georgia,2010,Europe & Central Asia,"4,352,244",4388.666828,73.883
+Denmark,2010,Europe & Central Asia,"5,550,142",32828.74123,78.969
+Philippines,2010,East Asia & Pacific,"93,260,798",3434.695972,68.207
+Moldova,2010,Europe & Central Asia,"3,572,885",2794.926563,68.541
+"Macedonia, FYR",2010,Europe & Central Asia,"2,060,563",8732.604054,74.731
+Morocco,2010,Middle East & North Africa,"31,951,412",4263.175989,70.246
+Namibia,2010,Sub-Saharan Africa,"2,283,289",5159.794219,62.594
+Mongolia,2010,East Asia & Pacific,"2,756,001",3345.801346,66.825
+Guinea-Bissau,2010,Sub-Saharan Africa,"1,515,224",595.5368598,53.578
+Switzerland,2010,Europe & Central Asia,"7,664,318",37220.03817,82.192
+Czech Rep.,2010,Europe & Central Asia,"10,492,960",22526.65908,77.267
+Portugal,2010,Europe & Central Asia,"10,675,572",20350.98257,79.291
+Estonia,2010,Europe & Central Asia,"1,341,140",16865.75955,74.094
+Kosovo,2010,Europe & Central Asia,,3762.324633,
+Equatorial Guinea,2010,Sub-Saharan Africa,"700,401",13383.7634,51.483
+"Korea, Rep.",2010,East Asia & Pacific,"48,183,584",25080.3515,80.772
+Uzbekistan,2010,Europe & Central Asia,"27,444,702",2753.989417,67.871
+Tunisia,2010,Middle East & North Africa,"10,480,934",7664.840299,75.147
+Timor-Leste,2010,East Asia & Pacific,"1,124,355",2987.64296,65.952
+Colombia,2010,America,"46,294,841",7417.802828,73.424
+Reunion,2010,Sub-Saharan Africa,"846,068",,78.879
+Burundi,2010,Sub-Saharan Africa,"8,382,849",468.4321824,52.638
+Taiwan,2010,East Asia & Pacific,"23,025,000",31372.91051,79.15
+Cyprus,2010,Europe & Central Asia,"1,103,647",24436.9442,79.348
+Barbados,2010,America,"273,331",16223.53076,74.875
+Madagascar,2010,Sub-Saharan Africa,"20,713,819",995.2184871,63.38
+Italy,2010,Europe & Central Asia,"60,550,848",26549.34432,81.923
+Bhutan,2010,South Asia,"725,940",5273.68657,67.015
+Sudan,2010,Sub-Saharan Africa,"34,136,520",2597.127808,61.49
+Nepal,2010,South Asia,"29,959,364",1203.934997,67.113
+Malta,2010,Europe & Central Asia,"416,515",22034.2506,79.225
+Suriname,2010,America,"524,636",8431.137039,70.309
+Venezuela,2010,America,"28,979,857",10956.60355,74.159
+Israel,2010,Middle East & North Africa,"7,418,400",26459.26565,81.295
+Central African Rep.,2010,Sub-Saharan Africa,"4,401,051",701.6569599,48.139
+Iceland,2010,Europe & Central Asia,"320,136",33316.46521,81.707
+Czechoslovakia,2010,Europe & Central Asia,,,
+East Germany,2010,Europe & Central Asia,,,
+Austria,2010,Europe & Central Asia,"8,393,644",35816.33659,80.595
+Papua New Guinea,2010,East Asia & Pacific,"6,858,266",2073.925052,61.994
+Cote d'Ivoire,2010,Sub-Saharan Africa,"19,737,800",1512.080876,49.642
+Zimbabwe,2010,Sub-Saharan Africa,"12,571,454",479.8247801,53.684
+Germany,2010,Europe & Central Asia,"82,302,465",32886.85849,80.234
+Gambia,2010,Sub-Saharan Africa,"1,728,394",793.6184343,58.109
+Kazakhstan,2010,Europe & Central Asia,"16,026,367",11040.26145,66.108
+Poland,2010,Europe & Central Asia,"38,276,660",17089.72163,75.902
+Mauritania,2010,Sub-Saharan Africa,"3,459,773",1801.646396,61.064
+Kyrgyzstan,2010,Europe & Central Asia,"5,334,223",2018.144688,67.054
+Trinidad and Tobago,2010,America,"1,341,465",17716.97671,69.55
+Latvia,2010,Europe & Central Asia,"2,252,060",13466.90975,71.836
+South Sudan,2010,Sub-Saharan Africa,9415421,2709.001354,53.488
+Hungary,2010,Europe & Central Asia,"9,983,645",16982.81705,74.227
+Syria,2010,Middle East & North Africa,"20,410,606",4609.73113,74.693
+Guadeloupe,2010,America,"460,666",,80.141
+Honduras,2010,America,"7,600,524",3516.584288,72.854
+Myanmar,2010,East Asia & Pacific,"47,963,012",1538.131781,64.658
+Mexico,2010,America,"113,423,047",11390.58354,76.836
+Egypt,2010,Middle East & North Africa,"81,121,077",6059.975994,70.478
+"Congo, Dem. Rep.",2010,Sub-Saharan Africa,"65,965,795",373.6323918,49.01
+Serbia,2010,Europe & Central Asia,"9,856,222",9437.814608,73.676
+Comoros,2010,Sub-Saharan Africa,"734,750",1022.62455,60.223
+United Kingdom,2010,Europe & Central Asia,"62,035,570",31448.18228,80.085
+Yugoslavia,2010,Europe & Central Asia,,,
+Greece,2010,Europe & Central Asia,"11,359,346",24947.10641,80.23
+Sri Lanka,2010,South Asia,"20,859,949",4561.071915,73.79
+Croatia,2010,Europe & Central Asia,"4,403,330",13615.80718,76.54
+Zambia,2010,Sub-Saharan Africa,"13,088,570",1420.231814,54.549

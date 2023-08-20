@@ -1,0 +1,9 @@
+# INFO ABOUT DATA FILES
+
+nhl_goals.json
+--- post-processed from https://www.kaggle.com/martinellis/nhl-game-data#game_plays.csv
+--- credit: Martin Ellis
+
+gapminder.csv
+--- post-processed from https://www.gapminder.org/data/
+--- credit: Gapminder

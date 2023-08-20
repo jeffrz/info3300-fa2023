@@ -1,0 +1,222 @@
+{
+  "nodes": [
+    {
+      "totalappearances": 952,
+      "name": "Aragorn"
+    },
+    {
+      "totalappearances": 278,
+      "name": "Boromir"
+    },
+    {
+      "totalappearances": 1983,
+      "name": "Frodo"
+    },
+    {
+      "totalappearances": 1168,
+      "name": "Gandalf"
+    },
+    {
+      "totalappearances": 390,
+      "name": "Gimli"
+    },
+    {
+      "totalappearances": 340,
+      "name": "Legolas"
+    },
+    {
+      "totalappearances": 634,
+      "name": "Merry"
+    },
+    {
+      "totalappearances": 734,
+      "name": "Pippin"
+    },
+    {
+      "totalappearances": 1498,
+      "name": "Sam"
+    }
+  ],
+  "links": [
+    {
+      "source": 0,
+      "target": 1,
+      "cooccurrence": 85
+    },
+    {
+      "source": 0,
+      "target": 2,
+      "cooccurrence": 157
+    },
+    {
+      "source": 0,
+      "target": 3,
+      "cooccurrence": 176
+    },
+    {
+      "source": 0,
+      "target": 4,
+      "cooccurrence": 145
+    },
+    {
+      "source": 0,
+      "target": 5,
+      "cooccurrence": 135
+    },
+    {
+      "source": 0,
+      "target": 6,
+      "cooccurrence": 112
+    },
+    {
+      "source": 0,
+      "target": 7,
+      "cooccurrence": 109
+    },
+    {
+      "source": 0,
+      "target": 8,
+      "cooccurrence": 127
+    },
+    {
+      "source": 1,
+      "target": 2,
+      "cooccurrence": 72
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "cooccurrence": 71
+    },
+    {
+      "source": 1,
+      "target": 4,
+      "cooccurrence": 49
+    },
+    {
+      "source": 1,
+      "target": 5,
+      "cooccurrence": 47
+    },
+    {
+      "source": 1,
+      "target": 6,
+      "cooccurrence": 30
+    },
+    {
+      "source": 1,
+      "target": 7,
+      "cooccurrence": 41
+    },
+    {
+      "source": 1,
+      "target": 8,
+      "cooccurrence": 53
+    },
+    {
+      "source": 2,
+      "target": 3,
+      "cooccurrence": 197
+    },
+    {
+      "source": 2,
+      "target": 4,
+      "cooccurrence": 63
+    },
+    {
+      "source": 2,
+      "target": 5,
+      "cooccurrence": 51
+    },
+    {
+      "source": 2,
+      "target": 6,
+      "cooccurrence": 149
+    },
+    {
+      "source": 2,
+      "target": 7,
+      "cooccurrence": 153
+    },
+    {
+      "source": 2,
+      "target": 8,
+      "cooccurrence": 383
+    },
+    {
+      "source": 3,
+      "target": 4,
+      "cooccurrence": 100
+    },
+    {
+      "source": 3,
+      "target": 5,
+      "cooccurrence": 78
+    },
+    {
+      "source": 3,
+      "target": 6,
+      "cooccurrence": 106
+    },
+    {
+      "source": 3,
+      "target": 7,
+      "cooccurrence": 148
+    },
+    {
+      "source": 3,
+      "target": 8,
+      "cooccurrence": 149
+    },
+    {
+      "source": 4,
+      "target": 5,
+      "cooccurrence": 133
+    },
+    {
+      "source": 4,
+      "target": 6,
+      "cooccurrence": 61
+    },
+    {
+      "source": 4,
+      "target": 7,
+      "cooccurrence": 58
+    },
+    {
+      "source": 4,
+      "target": 8,
+      "cooccurrence": 63
+    },
+    {
+      "source": 5,
+      "target": 6,
+      "cooccurrence": 55
+    },
+    {
+      "source": 5,
+      "target": 7,
+      "cooccurrence": 50
+    },
+    {
+      "source": 5,
+      "target": 8,
+      "cooccurrence": 52
+    },
+    {
+      "source": 6,
+      "target": 7,
+      "cooccurrence": 178
+    },
+    {
+      "source": 6,
+      "target": 8,
+      "cooccurrence": 137
+    },
+    {
+      "source": 7,
+      "target": 8,
+      "cooccurrence": 150
+    }
+  ]
+}
