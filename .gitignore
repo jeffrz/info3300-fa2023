@@ -3,6 +3,7 @@
 *.prof*.html
 *.prof*.docx
 *.prof*.py
+*.prof*.sh
 *.prof*/
 
 # others #
