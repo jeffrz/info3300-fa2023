@@ -48,45 +48,89 @@
 
     <!--- Code for today's class --->
     <script id="notes1">
-
+    
       // Try pasting these commands into your browser console
       
       // Console.log is our friend
       console.log('Hello World');
 
       // Let's explore some Javascript types!
-      console.log("--- Checking out some types ---")
-      
-      
-      
-      
-      
+      console.log("--- Testing some types ---")
+      console.log("---Numbers!");
+      console.log(typeof(1));
+      console.log(typeof(1.2));
+      console.log(typeof(Math.PI));
+      console.log("---Strings!");
+      console.log(typeof("hello"));
+      console.log(typeof('hello'));
+      console.log("---Classes?");
+      console.log(typeof(Math));
+      console.log("---Objects?");
+      console.log(new Object());
+      console.log(typeof(new Object()));
+      console.log(typeof(/regex/));  // regular expression
+      console.log("---Functions?");
+      // It's more complicated -- functions are also objects
+      console.log(typeof( console.log ));
+      console.log("---Undefined and null?");
+      console.log(typeof(undefined));  // You will see this most often, it is much like None in python or null in Java in terms of how it is used in JS
+      console.log(typeof(null)); // Null is less common than undefined, but worth noting
+      // Second bit of weirdness -- it shows as object but its type actually is null (legacy reasons)    
+      // Test some unicode  (note <meta> tag in file)
+      console.log("---What about unicode?");
+      console.log("ドーナツ");
+      console.log(typeof("ドーナツ"));  // なに！？！？！？
       
       // Learn a bit more about Objects
-      // console.log("--- Testing [] and {} ---")
-
+      console.log("--- Testing [] and {} ---")
+      console.log("Lists and dicts")
+      let list = [1, 2, 3];
+      console.log( list );
+      console.log(typeof( list )); 
+      // It says it's an object -- but arrays are a special kind of object (see length property)
       
+      // Every object is a dictionary in Javascript -- properties function as key/value pairs
+      let dict = {"a": 1, "b": 2};
+      console.log( dict );
+      console.log(dict["a"]);
+      console.log(dict.a); // shortcut to access properties with plain text names
       
-      
-
+      // What about that length part of a dict? What is it?
+      list.newKey = "this is a new key on a list";
+      console.log(list);
       
       // So what can accept keys?
-      // console.log("--- So what works like a dict? ---");
-      // let differentTypes = [3, "hello", new Object(), [1,2,3], function(x) {}, console];
-      // for (let item of differentTypes) {
-      //   console.log( item, typeof(item) );
-      //   item['test'] = "keyAdded";
-      //   console.log( item['test'] ); 
-      // } 
+      console.log("--- So what works like a dict? ---");
+      let differentTypes = [3, "hello", new Object(), [1,2,3], function(x) {}, console];
+      for (let item of differentTypes) {
+        console.log( item, typeof(item) );
+        item['test'] = "keyAdded";
+        console.log( item['test'] ); 
+      } 
+      // Though it's often a terrible idea, you can add properties to all sorts of things
+      // In some libraries you will find that they add properties to function calls and all sorts of other objects
+      //  This can be extremely convenient, but you may not notice them unless you check docs and console.log()
+      // Also notice that if you treat a list of things like a dictionary, then the .length property of the list does not get longer as you add keys. It only changes as you add things to the list.
       
       
-      // Types can get a bit unexpected in JS
-      // console.log("--- Now exploring type coercion ---")
-      
-      
-      
+      console.log("--- Now exploring type coercion ---")
+      // A simple addition?
+      console.log(0 + '0'); //  ???
+
+      // Type coercion
+      console.log(3 + "Rzeszotarski");
+      console.log("1" + 2);
+      console.log(1 + "2");
+      console.log(false + "Rzeszotarski");
+      console.log(true + false);
+      console.log("true" + false);
+      console.log([1,2,3] + 2)
+      // Only possibilities: ->string,  ->number,  ->boolean
+      // Learn more at https://www.freecodecamp.org/news/js-type-coercion-explained-27ba3d9a2839/
       // Why does this matter?
       
+      // let color = dict.color;
+      // document.getElementById("rectangle").setAttribute("fill", color);
       
       
       
