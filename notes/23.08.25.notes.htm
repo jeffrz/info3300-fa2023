@@ -1,0 +1,304 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>INFO 3300 - August 25</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+
+</head>
+<body>
+  <div class="container larger">
+    <h3>Notes for Friday, August 25</h3>
+    <p>
+      You can access these files from the <a href="https://github.com/jeffrz/info3300-fa2023">course Github repository</a>. The repository will be updated with notes shortly after class. While I encourage you to make use of a local copy of the repository so you can take notes, the version at this site will always be up-to-date and accessible. Execute a <tt>git pull</tt> in your repository directory to download new files. Prompt files won't change after posting, so feel free to modify them as you like. Here is an <a href="http://rogerdudler.github.io/git-guide/">informal guide to git</a>.
+    </p>
+    <p>
+      To develop efficiently, have a local web server running. Python has a simple, built-in server. Use <tt>python -m http.server</tt> for python 3; use <tt>python -m SimpleHTTPServer 8000</tt> for python 2 (execute python in cmd for version number).
+    </p>  
+    <p>
+        How does Javascript differ among popular web browsers? <a href="https://caniuse.com/">Can I Use</a> breaks down browser support and <a href="https://en.wikipedia.org/wiki/Usage_share_of_web_browsers">Browser Usage</a> on Wikipedia shows current market share. Count on your TAs using recent Chrome browsers to evaluate your assignments, but remember that much of the world may not.
+      </p>
+    <p>
+      Check out the docs for <a href="https://www.json.org/json-en.html">Javascript Object Notation</a>.
+    </p>
+    
+  
+    <h5>HTML for today:</h5>
+
+    <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+    <h5>Code for today:</h5>
+    <pre>
+      <code id="display1" class="hljs language-javascript">
+      </code>
+    </pre>
+
+
+    <!--- Code for today's class --->
+    <script id="notes1">
+    
+    // * Let's talk JSON
+    // JSON is used as a way to convey complex data over the web (e.g. getting data from an API elsewhere)
+    // Key benefit over something like serialization is that it is standardized and very human-readable
+
+    let obj = [{"name":"DDWA", "number":3300 },{"name": "Java", "number": 2110},{"name": "Python", "number": 1110}];
+    console.log(obj);
+    let jsonObj = JSON.stringify(obj) // Here is a JSON string for that object
+    console.log(jsonObj);
+    console.log(typeof(jsonObj));
+    console.log( JSON.parse(jsonObj) );
+
+    // This one won't parse because it breaks JSON specifications
+    let badStr = '{"list": ["commas,", "single_quo\'tes", "double_quo"tes", "@sÃ§i|"], "nestedObject": {"undefined": undefined, "defined": 3.1415926535}, "Infinity": Infinity, "NaN": NaN, "bool": true}'
+    //console.log(JSON.parse(badStr));
+    // Here is the fixed version, note escaped quotes, eliminated undefined, and no reserved numbers
+    // The \' is present because I used '' to create the string and need to escape quotes within it
+    // The \\" is present to escape the backslash so that the JSON string has \" in it, which is a required by the spec
+    let goodStr = '{"list": ["commas,", "single_quo\'tes", "double_quo\\"tes", "@sçi|"], "nestedObject": {"undefined": null, "defined": 3.1415926535}, "bool": true}'
+    console.log(goodStr);
+    console.log(JSON.parse(goodStr));
+    
+    
+    // Done incorrectly, the JSON parser can make you think you've fixed errors when you actually haven't
+    var fib = '[1; 2; 3; 5; 7; 12]';
+    //let fib = '"[1; 2; 3; 5; 7; 12]"';
+    //console.log(JSON.parse(fib));
+  
+  
+    // * Let's play with scoping of variables
+    //    We have three different declarations, var, const, and let
+    //    Var came earlier, const & let more recently
+    //    (only use VAR if you really mean it!)
+    let fruit = "banana";
+    var veg = "carrot";
+    const legume = "peanut";
+    
+    console.log("--start");
+    console.log(fruit);
+    console.log(veg);
+    console.log(legume);
+    
+    if (fruit === "banana") {   // curly braces signal we have entered the if statement's block scope
+      let fruit = "pineapple";
+      var veg = "broccoli";
+      // const legume = "lentil";  // const should not be overwritten
+      
+      console.log("--in if");
+      console.log(fruit);
+      console.log(veg);
+    }
+    console.log("--out if");
+    console.log(fruit);
+    console.log(veg);
+    
+    // Notice how the "veg" change leaks outside of the "if" scope, but "fruit" does not stay overwritten -- it only changes within the block
+    
+    // let is a "block-scoped" declaration -- it behaves most like what you're familiar with in Python, so use it 
+    // var is usually globally scoped or scoped within a function() -- this can create unexpected issues
+    // Only use var for things you want to access everywhere -- ideally just set them to const at the top of the file if possible
+    
+    // Let's look at scopes in script tags
+    let test = "script tags. how do they work?";
+    
+    // Let's look at *hoisting* of variables
+    console.log(x);
+    var x = 5;
+    console.log(x);
+    // *declarations* are hoisted, but not the values themselves
+    // This explains why commenting out the first "let fruit" line causes an error but commenting out "var veg" does not -- it's hoisted
+    
+    
+  
+    // * Conditionals, functions and loops in c/java style and functional style.
+    //   (to learn more about functions, check out http://ejohn.org/apps/learn/)
+    
+    // If statements:
+    let y = 5;
+    if ( y === 5 ) { console.log("equals 5"); }
+    else if ( y === 6 ) { console.log("equals 6"); }
+    else { console.log("equals something else"); }
+    
+          
+    // The more familiar format specifies a name for the function.
+    console.log( favoriteColor() );
+    function favoriteColor() {
+      return "red";
+    }
+    console.log( favoriteColor() );
+    // Note that we can use favoriteColor() *above* the function declaration because it is also hoisted
+    // This only works with the *function name() { }* style function declaration
+    //   There are going to be some other cases this term where *function name() { }* declarations are special
+
+
+    // We can also declare an "anonymous" function and then give it a name.
+    var favoriteNumber = function() { return 51; }
+    // But notice that both styles have exactly the same effect:
+    //  they create a variable whose value is a function.
+
+
+    // We can pass a function as an argument. Note the difference between
+    //  f and f(). One is the function itself
+    function display(f) {
+      console.log( f() );  // We take in function f as a parameter, then run it in this line
+    }
+    display(favoriteColor);
+    display(favoriteNumber);
+    
+    // EXTRA INFO AFTER CLASS:
+    // We can also return functions as a form of lazy execution!
+    // Functions remember the variables that were available when they were defined. This can enable lazy evaluation
+    function addOne( number ) {
+      return function() { return number + 1; }
+    }
+    console.log( addOne(1) );   // we get a function back 
+    console.log( addOne(1)() )  // which we can then execute if we want
+    //  ...but unlike some functional programming languages, this has some overhead so it isn't a great pattern to use for everything
+
+
+    // Finally, in modern javascript there is a handy shortcut -- arrow functions
+    let bestAnimal = () => { console.log("dog"); }
+    let addNums = (num1, num2) => { return num1 + num2; }
+    let addTwo = number => { return number+2; } // If you only have one parameter, you can skip the parentheses
+    let addThree = number => number+3; // If you are immediately returning, you can actually just skip the { } and return
+      
+    
+    // * Brief foray into "destructuring"
+    // Javascript can help to destructure objects and arrays during variable assignment
+    //  (Credit for some examples goes to https://codeburst.io/es6-destructuring-the-complete-guide-7f842d08b98f -- check this out for lots of other capabilities and examples of destructuring)
+    
+    // Destructuring arrays
+    let color = [24, 50, 240];
+    // let r = color[0];
+    // let g = color[1];
+    // let b = color[2];
+    
+    let [r, g, b] = color;
+    console.log(r,g,b);
+    
+    
+    // Destructuring objects (dictionaries) 
+    let student = {name: "Herb Ertlinger", class: "INFO3300", age:21};
+    
+    function printStudent( { name: nm, class: cls} ) {   // It also works when function parameters are declared!
+      console.log(nm, cls);
+    }
+    printStudent(student);
+    
+    
+    // You can take destructuring pretty far
+    // For example, you can use it to simplify variable swaps
+    let width = 50;
+    let height = 100;
+    
+    // let t = width;
+    // let width = height;
+    // let height = t;
+    //   ...becomes
+    [height, width] = [width, height];
+    
+    console.log(width, height);
+    
+
+    
+    // * Now a bit of looping
+    let list = ["red","green","blue","yellow"];
+    for (let i=0; i<list.length; i++) { 
+      console.log(list[i]);
+    }
+    
+    // There are a few different operators you can try
+    for (let index in list) {
+      console.log(index);
+    }
+    // "__ in list" gives you indices and keys
+    
+    for (let obj of list) {
+      console.log(obj);
+    }
+    // "__ of list" gives you elements in the list (does not work on dicts -- for that use "___ of Object.entries(dict)"
+    
+    
+    list.forEach( d => {
+      console.log(d);
+    });
+    // This is an incredibly common pattern in JS
+    // .forEach requires that you provide one parameter which is a function
+    //   The function you give it will get one object at a time from the list as a parameter
+    //   so the item => { } you see here is an arrow function that is run for each item in the array
+    
+    
+    // Note: the Object class has a bunch of other useful static methods for arrays and dicts
+    // One common one we'll use is Object.entries( dict ) that gives you all entries in a dict-like object
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#static_methods
+    
+    
+    // One last pattern -- utility functions that require you to provide a "getter" function
+    
+    // Imagine that someone else wrote this function that does something cool to student names
+    //  ...but, they don't know what your list of data looks like, and they don't want to force you to use a specific
+    //   data structure or follow some specific schema in order to use their code
+    // Your data looks like this, and you know the name key for each item in the list has what the function needs
+    let students = [{name: "Herb Ertlinger", class:"INFO3300", age:21}, {name: "Glerb Mertlinger", class:"INFO5100", age:20}, {name: "Tarp Ertlerga", class:"CS3300", age:20}];
+    
+    // Instead, the function designer makes you provide a "getter" function kind of like in .forEach, that is run for each of the items
+    //   in the list and helps the function get to the data it needs, no matter what your data structure looks like
+    // In this case, notice how the nameProcessor iterates, and uses the getterFunc that the user provides to find the name
+    function nameProcessor( lst, getterFunc ) {
+      for (let obj of lst) {
+        console.log('The name is:', getterFunc( obj ) );
+      }
+    }
+    
+    // So we give nameProcessor an anonymous getter function that says "for each item d in our list, in order to get the name you need, run d['name']"
+    nameProcessor( students, d => d['name'] );
+    // functionally equivalent to:  nameProcessor( students, function(d) {return d['name']} )
+
+    
+    
+    
+    
+    
+    
+    
+    
+    // Note: the Object class has a bunch of other useful static methods for arrays and dicts
+    // One common one we'll use is Object.entries( dict ) that gives you all entries in a dict-like object
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#static_methods
+
+
+      
+    
+
+
+    </script>
+
+
+    
+    
+    
+
+    <!--- calls the highlight library to fill the <pre> tag with code --->
+    <script>
+    
+    function sanitize(s) {
+      return s.replace("<br>", "\\n")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+            }
+      document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+      hljs.highlightAll();
+    </script>
+
+  </div>
+</body>
+</html>

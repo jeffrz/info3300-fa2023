@@ -1,0 +1,170 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>INFO 3300 - August 25</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+
+</head>
+<body>
+  <div class="container larger">
+    <h3>Notes for Friday, August 25</h3>
+    <p>
+      You can access these files from the <a href="https://github.com/jeffrz/info3300-fa2023">course Github repository</a>. The repository will be updated with notes shortly after class. While I encourage you to make use of a local copy of the repository so you can take notes, the version at this site will always be up-to-date and accessible. Execute a <tt>git pull</tt> in your repository directory to download new files. Prompt files won't change after posting, so feel free to modify them as you like. Here is an <a href="http://rogerdudler.github.io/git-guide/">informal guide to git</a>.
+    </p>
+    <p>
+      To develop efficiently, have a local web server running. Python has a simple, built-in server. Use <tt>python -m http.server</tt> for python 3; use <tt>python -m SimpleHTTPServer 8000</tt> for python 2 (execute python in cmd for version number).
+    </p>  
+    <p>
+        How does Javascript differ among popular web browsers? <a href="https://caniuse.com/">Can I Use</a> breaks down browser support and <a href="https://en.wikipedia.org/wiki/Usage_share_of_web_browsers">Browser Usage</a> on Wikipedia shows current market share. Count on your TAs using recent Chrome browsers to evaluate your assignments, but remember that much of the world may not.
+      </p>
+    <p>
+      Check out the docs for <a href="https://www.json.org/json-en.html">Javascript Object Notation</a>.
+    </p>
+    
+  
+    <h5>HTML for today:</h5>
+
+    <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+    <h5>Code for today:</h5>
+    <pre>
+      <code id="display1" class="hljs language-javascript">
+      </code>
+    </pre>
+
+
+    <!--- Code for today's class --->
+    <script id="notes1">
+    
+    // * Let's talk JSON
+    // JSON is used as a way to convey complex data over the web (e.g. getting data from an API elsewhere)
+    // Key benefit over something like serialization is that it is standardized and very human-readable
+
+    let obj = [{"name":"DDWA", "number":3300 },{"name": "Java", "number": 2110},{"name": "Python", "number": 1110}];
+    
+    
+
+    // This one won't parse because it breaks JSON specifications
+    // let badStr = '{"list": ["commas,", "single_quo\'tes", "double_quo"tes", "@sÃ§i|"], "nestedObject": {"undefined": undefined, "defined": 3.1415926535}, "Infinity": Infinity, "NaN": NaN, "bool": true}'
+    
+    
+    
+    // Done incorrectly, the JSON parser can make you think you've fixed errors when you actually haven't
+    // var fib = '[1; 2; 3; 5; 7; 12]';
+    
+  
+  
+  
+  
+    // * Let's play with scoping of variables
+    //    We have three different declarations, var, const, and let
+    //    Var came earlier, const & let more recently
+    //    (only use VAR if you really mean it!)
+    
+    
+          
+    // Let's look at *hoisting* of variables
+    
+    
+    
+  
+  
+  
+    // * Conditionals, functions and loops in c/java style and functional style.
+    //   (to learn more about functions, check out http://ejohn.org/apps/learn/)
+    
+    // If statements:
+    
+    
+    
+    // Functions:
+    
+  
+
+    
+    
+    
+    // * Brief foray into "destructuring"
+    // Javascript can help to destructure objects and arrays during variable assignment
+    //  (Credit for some examples goes to https://codeburst.io/es6-destructuring-the-complete-guide-7f842d08b98f -- check this out for lots of other capabilities and examples of destructuring)
+    
+    
+    // let color = [24, 50, 240];
+    // let r = color[0];
+    // let g = color[1];
+    // let b = color[2];
+    // console.log(r,g,b);
+    
+    
+    // let student = {name: "Herb Ertlinger", class: "INFO3300", age:21};
+    // 
+    // function printStudent( student ) {   // It also works when function parameters are declared!
+    //   console.log(student.name, student.class);
+    // }
+    // printStudent(student);
+    
+    
+    // let width = 50;
+    // let height = 100;
+    // 
+    // let t = width;
+    // let width = height;
+    // let height = t;
+    // 
+    // console.log(width, height);
+
+    
+    // * Now a bit of looping
+    // let list = ["red","green","blue","yellow"];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // Note: the Object class has a bunch of other useful static methods for arrays and dicts
+    // One common one we'll use is Object.entries( dict ) that gives you all entries in a dict-like object
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#static_methods
+
+
+      
+    
+
+
+    </script>
+
+
+    
+    
+    
+
+    <!--- calls the highlight library to fill the <pre> tag with code --->
+    <script>
+    
+    function sanitize(s) {
+      return s.replace("<br>", "\\n")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+            }
+      document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+      hljs.highlightAll();
+    </script>
+
+  </div>
+</body>
+</html>
