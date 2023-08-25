@@ -8,9 +8,9 @@
   <link rel="stylesheet" type="text/css" href="../css/normalize.css">
   <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
   <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
-
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/default.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
 </head>
 <body>
@@ -134,18 +134,36 @@
       
       
       
+      
+      
       // Comparison weirdness
       // console.log("--- Now trying some comparisons ---")
+      console.log( (true + 1) == "2" );
+      console.log( 0 == "0" );
+      console.log( [] == 0 );
+      console.log( [1] == true );
+      console.log( [[]] == 0 );
+      console.log( [[]] == [] );  // coercion doesn't happen here, so they are unequal
       
+      console.log( 'Explicit comparison', '0' === 0 );
       
-      
-      
+      // Null and undefined can cause unusual behaviors too
+      console.log( 6 + null );
+      console.log( 6 + undefined);
+      console.log( null === 0 );
+      console.log( null === undefined );
+      console.log( NaN === NaN );
+      console.log( [1,2,3] === [1,2,3] );  // not equal because they are 2 different objects
+                                           // to check that the lists are equivalent, use a built-in function or a loop
 
       // Shortcircuiting of logical statements
-      // console.log("--- Shortcircuiting ---");
-
-
-
+      console.log("--- Shortcircuiting ---");
+      true || console.log("logged-or") || false
+      true && console.log("logged-and") && false
+      false && console.log("logged-not-and") && true
+      
+      
+      let test = "script tags. how do they work?";
 
     </script>
 
@@ -153,21 +171,7 @@
     <script id="notes2">
     
       // How do two script tags interact with each other?
-      let test = "script tags. how do they work?";
-      
-      
-      // * Let's talk JSON
-      
-      
-
-      // let obj = [{"name":"DDWA", "number":3300 },{"name": "Java", "number": 2110},{"name": "Python", "number": 1110}];
-      // console.log(obj);
-      
-
-
-      // This one won't parse because it breaks JSON specifications
-      // let badStr = '{"list": ["commas,", "single_quo\'tes", "double_quo"tes", "@sÃ§i|"], "nestedObject": {"undefined": undefined, "defined": 3.1415926535}, "Infinity": Infinity, "NaN": NaN, "bool": true}'
-      
+      console.log(test);
       
       
       
@@ -181,9 +185,17 @@
 
     <!--- calls the highlight library to fill the <pre> tag with code --->
     <script>
-    document.getElementById("display1").innerText = document.getElementById("notes1").innerText;
-    document.getElementById("display2").innerText = document.getElementById("notes2").innerText;
-    hljs.initHighlightingOnLoad();
+    function sanitize(s) {
+      return s.replace("<br>", "\\n")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+            }
+      document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+      document.getElementById("display2").innerHTML = sanitize( document.getElementById("notes2").innerText);
+      hljs.highlightAll();
     </script>
 
   </div>
