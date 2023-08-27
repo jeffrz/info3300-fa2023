@@ -1,0 +1,154 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>INFO 3300 - August 28</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
+
+</head>
+<body>
+  <div class="container larger">
+    <h3>Prompt for Monday, August 28</h3>
+    <p>
+      You can access these files from the <a href="https://github.com/jeffrz/info3300-fa2022">course Github repository</a>. The repository will be updated with notes shortly after class. While I encourage you to make use of a local copy of the repository so you can take notes, the version at this site will always be up-to-date and accessible. Execute a <tt>git pull</tt> in your repository directory to download new files. Prompt files won't change after posting, so feel free to modify them as you like. Here is an <a href="http://rogerdudler.github.io/git-guide/">informal guide to git</a>.
+    </p>
+    <p>
+      To develop efficiently, have a local web server running. Python has a simple, built-in server. Use <tt>python -m http.server</tt> for python 3; use <tt>python -m SimpleHTTPServer 8000</tt> for python 2 (execute python in cmd for version number).
+    </p>  
+    <p>
+      Here are some SVG resources:
+      <ul>
+          <li> <a href="https://www.w3.org/TR/2018/CR-SVG2-20181004/">Current SVG Specification</a></li>
+          <li> <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">Mozilla SVG Documentation</a></li>
+          <li> <a href="https://flaviocopes.com/svg/">https://flaviocopes.com/svg/</a></li>
+          <li> <a href="https://alignedleft.com/tutorials/d3/an-svg-primer">https://alignedleft.com/tutorials/d3/an-svg-primer</a></li>
+          <li> <a href="http://tutorials.jenkov.com/svg/svg-transformation.html">http://tutorials.jenkov.com/svg/svg-transformation.html</a></li>
+          <li> <a href="https://www.sarasoueidan.com/blog/svg-transformations/">https://www.sarasoueidan.com/blog/svg-transformations/</a></li>
+      </ul>
+    </p>
+    
+  
+  
+  
+  
+    <h5>HTML for today:</h5>
+
+    <h3>Shapes and Coordinates</h3>
+
+    <p>The coordinate system starts at the top left corner, (0,0). Positive y values move down towards the bottom. Positive x values move towards the right. We can use DOM attributes or CSS to apply styles to elements.</p>
+
+    <br>
+    
+    <!--- SVG goes here! --->
+    
+    
+
+
+    <h3>Paths</h3>
+
+    <p>This is the most complicated SVG element, but also one of the most useful. It contains <a href="https://www.w3.org/TR/SVG/paths.html#PathData">a tiny programming language</a>.</p>
+
+    <br>
+
+    <svg height=200 width=200 style="border:1px solid black; margin-bottom: 50px;">
+      
+      <!--- Making some gridlines! --->
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 20 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 40 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 60 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 80 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 100 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 120 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 140 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 160 H 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 0 180 H 200" />
+
+      <path style="stroke:#ccc; stroke-width:1" d="M 20 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 40 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 60 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 80 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 100 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 120 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 140 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 160 0 V 200" />
+      <path style="stroke:#ccc; stroke-width:1" d="M 180 0 V 200" />
+
+      <!--- Now let's draw a polygon --->
+      
+      
+      
+      
+      
+    </svg>
+
+
+
+
+    <h3>Transformations</h3>
+
+    <p>Transformations are another useful (but a bit tricky) tool. How do we stretch, rotate, and shift elements, and how does the order of these operations affect the result?</p>
+
+    <p>Wrapping all elements in a translate() transformation moves the coordinate system. We often want to do this to add a margin around a plot while keeping our mapping from data to x,y positions simple.</p>
+
+    <br>
+
+    <p>First, let's mark the origin, (0,0).</p>
+    
+    
+    <svg height="200" width="200">
+      
+    </svg>
+    
+
+    <p>Now let's move the origin to the center. The g tag assigns properties to sets of elements.</p>
+    
+    
+    
+    
+
+    <p>Let's create some circles in our translated space.</p>
+    
+    
+    
+    
+
+    <p>Let's perform a translation on one of the circles.</p>
+    
+    
+    
+    
+
+    <p>Let's both perform a translation and scale one of the circles.</p>
+    
+    
+    
+    
+
+    <p>The order matters! What happens if we scale first and then perform a translation?</p>
+    
+    
+    
+    
+
+    <p>Finally, let's try rotating our coordinate system.</p>
+    
+    
+    
+    
+
+    <p>Note: It can be very confusing if you get the order wrong when rotate() gets involved!</p>
+    
+    
+    
+    
+
+  </div>
+</body>
+</html>
