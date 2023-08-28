@@ -165,8 +165,8 @@
     // Finally, in modern javascript there is a handy shortcut -- arrow functions
     let bestAnimal = () => { console.log("dog"); }
     let addNums = (num1, num2) => { return num1 + num2; }
-    let addTwo = number => { return number+2; } // If you only have one parameter, you can skip the parentheses
-    let multByTwo = number => number*2; // If you are immediately returning, you can actually just skip the { } and return
+    let addTwo = (number) => { return number+2; } // If you only have one parameter, you can skip the parentheses
+    let multByTwo = (number) => number*2; // If you are immediately returning, you can actually just skip the { } and return
     
     
     
@@ -174,36 +174,93 @@
     // Javascript can help to destructure objects and arrays during variable assignment
     //  (Credit for some examples goes to https://codeburst.io/es6-destructuring-the-complete-guide-7f842d08b98f -- check this out for lots of other capabilities and examples of destructuring)
     
-    
-    // let color = [24, 50, 240];
+    // Destructuring arrays
+    let color = [24, 50, 240];
     // let r = color[0];
     // let g = color[1];
     // let b = color[2];
-    // console.log(r,g,b);
+    
+    let [r, g, b] = color;
+    console.log(r,g,b);
     
     
-    // let student = {name: "Herb Ertlinger", class: "INFO3300", age:21};
-    // 
-    // function printStudent( student ) {   // It also works when function parameters are declared!
-    //   console.log(student.name, student.class);
-    // }
-    // printStudent(student);
+    // Destructuring objects (dictionaries) 
+    let student = {name: "Herb Ertlinger", class: "INFO3300", age:21};
+    
+    function printStudent( { name: nm, class: cls} ) {   // It also works when function parameters are declared!
+      console.log(nm, cls);
+    }
+    printStudent(student);
     
     
-    // let width = 50;
-    // let height = 100;
-    // 
+    // You can take destructuring pretty far
+    // For example, you can use it to simplify variable swaps
+    let width = 50;
+    let height = 100;
+    
     // let t = width;
     // let width = height;
     // let height = t;
-    // 
-    // console.log(width, height);
+    //   ...becomes
+    [height, width] = [width, height];
+    
+    console.log(width, height);
+    
 
     
     // * Now a bit of looping
-    // let list = ["red","green","blue","yellow"];
+    let list = ["red","green","blue","yellow"];
+    for (let i=0; i<list.length; i++) { 
+      console.log(list[i]);
+    }
+    
+    // There are a few different operators you can try
+    for (let index in list) {
+      console.log(index);
+    }
+    // "__ in list" gives you indices and keys
+    
+    for (let obj of list) {
+      console.log(obj);
+    }
+    // "__ of list" gives you elements in the list (does not work on dicts -- for that use "___ of Object.entries(dict)"
     
     
+    list.forEach( d => {
+      console.log(d);
+    });
+    // This is an incredibly common pattern in JS
+    // .forEach requires that you provide one parameter which is a function
+    //   The function you give it will get one object at a time from the list as a parameter
+    //   so the item => { } you see here is an arrow function that is run for each item in the array
+    
+    
+    // Note: the Object class has a bunch of other useful static methods for arrays and dicts
+    // One common one we'll use is Object.entries( dict ) that gives you all entries in a dict-like object
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#static_methods
+    
+    
+    // One last pattern -- utility functions that require you to provide a "getter" function
+    
+    // Imagine that someone else wrote this function that does something cool to student names
+    //  ...but, they don't know what your list of data looks like, and they don't want to force you to use a specific
+    //   data structure or follow some specific schema in order to use their code
+    // Your data looks like this, and you know the name key for each item in the list has what the function needs
+    let students = [{name: "Herb Ertlinger", class:"INFO3300", age:21}, {name: "Glerb Mertlinger", class:"INFO5100", age:20}, {name: "Tarp Ertlerga", class:"CS3300", age:20}];
+    
+    // Instead, the function designer makes you provide a "getter" function kind of like in .forEach, that is run for each of the items
+    //   in the list and helps the function get to the data it needs, no matter what your data structure looks like
+    // In this case, notice how the nameProcessor iterates, and uses the getterFunc that the user provides to find the name
+    function nameProcessor( lst, getterFunc ) {
+      for (let obj of lst) {
+        console.log('The name is:', getterFunc( obj ) );
+      }
+    }
+    
+    // So we give nameProcessor an anonymous getter function that says "for each item d in our list, in order to get the name you need, run d['name']"
+    nameProcessor( students, d => d['name'] );
+    // functionally equivalent to:  nameProcessor( students, function(d) {return d['name']} )
+
     
     
     
@@ -217,7 +274,6 @@
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#static_methods
 
 
-      
     
     
 
