@@ -1,0 +1,215 @@
+<html><head>
+<title>INFO 3300 - September 6</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <!--- D3 IMPORT HERE --->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!--- D3 IMPORT HERE --->
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for September 6</h3>
+  <p>
+  	<a href="https://d3js.org/">D3</a> is a library that makes it easy to create and manipulate page elements. It's not restricted to SVG elements, but that's what we'll usually use it for. We'll start by using d3 to select DOM elements, create new elements, and modify the content and appearance of elements.
+  </p>
+  <p>
+    You can find a bunch of D3 examples <a href="https://observablehq.com/@d3/gallery">here</a> and access <a href="https://github.com/d3/d3/blob/master/API.md">D3's online API reference</a>.
+  </p>
+  <p>
+    Today we will be looking at <a href="https://github.com/d3/d3-scale">d3 scales</a>. Here is a helpful diagram for how scaleLinear works:
+    <img src="../misc/23.09.06.png" width=720 style="padding-top: 20px;" />
+  </p>
+
+  <h5>HTML for today:</h5>
+
+  <svg id="all" height="400" width="400" style="background: #F5F5F5; margin-bottom: 30px;">
+    <!--- We're going to be populating this dynamically today --->
+  </svg>
+  <br/>
+  <svg id="male" height="400" width="300" style="background: #F5F5FF">
+    <!--- We're going to be populating this dynamically today --->
+  </svg>
+  <svg id="female" height="400" width="300" style="background: #FFF5F5">
+    <!--- We're going to be populating this dynamically today --->
+  </svg>
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display" class="hljs javascript">
+    </code>
+  </pre>
+
+  <!--- Code for today's class --->
+  <script id="notes">
+  // First, some data ( "binned" data of Titanic passengers ):
+  passengers = [{"age": 0, "lived": 21, "died": 13}, {"age": 5, "lived": 21, "died": 11}, {"age": 10, "lived": 12, "died": 16}, {"age": 15, "lived": 27, "died": 33}, {"age": 20, "lived": 64, "died": 115}, {"age": 25, "lived": 67, "died": 104}, {"age": 30, "lived": 132, "died": 285}, {"age": 35, "lived": 46, "died": 62}, {"age": 40, "lived": 28, "died": 57}, {"age": 45, "lived": 23, "died": 39}, {"age": 50, "lived": 27, "died": 25}, {"age": 55, "lived": 15, "died": 17}, {"age": 60, "lived": 11, "died": 16}, {"age": 65, "lived": 4, "died": 10}, {"age": 70, "lived": 0, "died": 5}, {"age": 75, "lived": 1, "died": 1}, {"age": 80, "lived": 1, "died": 0}];
+
+  passengersFemale = [{"age": 0, "lived": 10, "died": 6}, {"age": 5, "lived": 12, "died": 3}, {"age": 10, "lived": 5, "died": 8}, {"age": 15, "lived": 23, "died": 5}, {"age": 20, "lived": 48, "died": 21}, {"age": 25, "lived": 42, "died": 14}, {"age": 30, "lived": 83, "died": 47}, {"age": 35, "lived": 35, "died": 5}, {"age": 40, "lived": 21, "died": 7}, {"age": 45, "lived": 17, "died": 6}, {"age": 50, "lived": 18, "died": 2}, {"age": 55, "lived": 11, "died": 1}, {"age": 60, "lived": 9, "died": 1}, {"age": 65, "lived": 4, "died": 1}, {"age": 70, "lived": 0, "died": 0}, {"age": 75, "lived": 1, "died": 0}, {"age": 80, "lived": 0, "died": 0}];
+
+  passengersMale = [{"age": 0, "lived": 11, "died": 7}, {"age": 5, "lived": 9, "died": 8}, {"age": 10, "lived": 7, "died": 8}, {"age": 15, "lived": 4, "died": 28}, {"age": 20, "lived": 16, "died": 94}, {"age": 25, "lived": 25, "died": 90}, {"age": 30, "lived": 49, "died": 238}, {"age": 35, "lived": 11, "died": 57}, {"age": 40, "lived": 7, "died": 50}, {"age": 45, "lived": 6, "died": 33}, {"age": 50, "lived": 9, "died": 23}, {"age": 55, "lived": 4, "died": 16}, {"age": 60, "lived": 2, "died": 15}, {"age": 65, "lived": 0, "died": 9}, {"age": 70, "lived": 0, "died": 5}, {"age": 75, "lived": 0, "died": 1}, {"age": 80, "lived": 1, "died": 0}];
+  
+    // --- 1. Let's make a histogram of all passengers on the Titanic
+    //  This will take the form of a bar chart -- but we are using a trick and not creating <rect> for each bar
+    //  Instead, we'll make a thick vertical <line> for each bar. I don't recommend you do this outside of toy examples
+    console.log(passengers);
+    
+    
+    
+    
+    
+    // --- 2. What about deaths? (oop, things are getting pretty dark)
+    //  We can make a double histogram for this!
+    
+    
+    
+
+
+
+
+    // --- 3. Let's break the data down by gender now!
+    
+    
+    
+    
+    
+    
+
+    // svg.append("text").text("Male Passengers").attr("x",10).attr("y",20).style("font-size","15px");
+
+
+
+
+
+    // svg.append("text").text("Female Passengers").attr("x",10).attr("y",20).style("font-size","15px");
+    
+    
+    
+    
+    
+  </script>
+
+  
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display").innerHTML = sanitize( document.getElementById("notes").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  <!--- This is what our dataset looks like:
+
+[
+  {
+    "age": 0,
+    "lived": 21,
+    "died": 13
+  },
+  {
+    "age": 5,
+    "lived": 21,
+    "died": 11
+  },
+  {
+    "age": 10,
+    "lived": 12,
+    "died": 16
+  },
+  {
+    "age": 15,
+    "lived": 27,
+    "died": 33
+  },
+  {
+    "age": 20,
+    "lived": 64,
+    "died": 115
+  },
+  {
+    "age": 25,
+    "lived": 67,
+    "died": 104
+  },
+  {
+    "age": 30,
+    "lived": 132,
+    "died": 285
+  },
+  {
+    "age": 35,
+    "lived": 46,
+    "died": 62
+  },
+  {
+    "age": 40,
+    "lived": 28,
+    "died": 57
+  },
+  {
+    "age": 45,
+    "lived": 23,
+    "died": 39
+  },
+  {
+    "age": 50,
+    "lived": 27,
+    "died": 25
+  },
+  {
+    "age": 55,
+    "lived": 15,
+    "died": 17
+  },
+  {
+    "age": 60,
+    "lived": 11,
+    "died": 16
+  },
+  {
+    "age": 65,
+    "lived": 4,
+    "died": 10
+  },
+  {
+    "age": 70,
+    "lived": 0,
+    "died": 5
+  },
+  {
+    "age": 75,
+    "lived": 1,
+    "died": 1
+  },
+  {
+    "age": 80,
+    "lived": 1,
+    "died": 0
+  }
+]
+
+
+  --->
+
+
+  </div>
+</body>
+</html>

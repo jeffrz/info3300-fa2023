@@ -4,6 +4,7 @@
 *.prof*.docx
 *.prof*.py
 *.prof*.sh
+*.prof*.ai
 *.prof*/
 
 # others #
