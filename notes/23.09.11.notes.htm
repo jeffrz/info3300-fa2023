@@ -1,0 +1,146 @@
+<html><head>
+<title>INFO 3300 - September 11</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <style>
+  
+  .gridlines line {
+    stroke: #bbb;
+  }
+  
+  .gridlines .domain {
+    stroke: none;
+  }
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for September 11</h3>
+  <p>
+    Our dataset is sourced from Gapminder. We'll do a spinoff on one of <a href="https://youtu.be/jbkSRLYSojo">Hans Rosling's famous data presentations</a>.
+  </p>
+  <p>
+    The <a href="https://github.com/d3/d3-fetch/tree/v2.0.0">d3.csv command</a> makes use of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a>. To learn more about why we use ".then", check out the documentation on <a href="https://developers.google.com/web/fundamentals/primers/promises">JS Promises</a>.
+  </p>
+
+  <h5>HTML for today:</h5>
+
+
+
+  <svg id="scatterplot" height="400" width="400" style="margin-top:50px" >
+
+  </svg>
+
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display" class="hljs javascript">
+    </code>
+  </pre>
+
+  <!--- Code for today's class --->
+  <script id="notes">
+  
+    // --- 1
+    //  '../datasets/titanic.json'
+    console.log( '---Top of file---' );
+                  
+    
+    
+
+    // --- 2
+    // Let's make a plain old scatterplot
+
+    // 0. Find our SVG and get that ready
+    //     We're going to use a new way of padding that makes axes easier
+    // const svg = d3.select('svg#scatterplot');
+    // const width = svg.attr('width');
+    // const height = svg.attr('height');
+    
+    
+    
+    
+    // 1. Import some CSV data
+    //        .then( function(successfulResult), function(errorMessage) )
+    
+    
+            
+    // 2. Check for data issues
+    
+  
+
+    // 3. Let's build some scales
+    
+    
+    
+    
+    // 4. Start plotting circles and see what happens
+    
+    
+    
+    
+    
+    
+    // ---- 3
+    // 5. Let's add some axes
+    // We're going to use D3's axis tools to do it
+    
+    
+    
+    
+    // 5A. We can manually make some gridlines
+    //  It would work fine for HW4, but I don't recommend it once you start using axis labels
+    
+    
+    
+
+    // 5B. Or we can use axes in a clever way
+    
+    
+    
+    
+    
+    // Next up: filtering, legends, and advanced formatting
+    
+    
+
+  
+
+
+  </script>
+
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display").innerHTML = sanitize( document.getElementById("notes").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
