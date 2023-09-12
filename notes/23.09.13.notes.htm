@@ -1,4 +1,5 @@
-<html><head>
+<html>
+<head>
 <title>INFO 3300 - September 11</title>
 
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
@@ -79,8 +80,16 @@
     
     
             
-    // 2. Check for data issues
-    
+    // 2. Check for data issues - This was copy-pasted in for class due to time
+    // // Let's fix some things up
+    // data.forEach( (d, i) => {
+    //   d['life'] = Number(d['Life Expectancy']);
+    //   d['gdp'] = Number(d['GDP/Person (PPP$)']);
+    //   // d['pop'] = Number(d['Total Population']); // This will pump out NaNs. Why?
+    //   d['pop'] = Number(d['Total Population'].replace(/,/g,'')); // Fix with replace for commas
+    // });
+    // // Try commenting this out and then see notes below #4
+    // data = data.filter( (d) => {return d['gdp'] != 0 && d['life'] != 0 && d['pop'] != 0;}  );
   
 
     // 3. Let's build some scales
