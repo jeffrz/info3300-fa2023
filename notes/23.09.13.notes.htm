@@ -218,16 +218,46 @@
     //  It would work fine for HW4, but I don't recommend it once you start using axis labels
     
     
-    
-
     // 5B. Or we can use axes in a clever way
+    //  Create the axis
+    //   Configure it so that tickFormat is empty (don't make text labels)
+    //   Set tickSize to be a negative number, so instead of hanging below the chart the gridlined extend back into it
+    
+    //  FINALLY, don't forget to use CSS to configure the gridlines a bit
+    //   You will want to make the <line> elements a bit lighter and hide the element that has class .domain (that's the perpendicular line that connects the ticks)
+    //   See CSS in head of this file for example
+    let leftGridlines = d3.axisLeft(lifeScale)
+                          .tickSize(-chartWidth-10)
+                          .tickFormat('');
+    // Notice how we use a different class
+    svg.append('g')
+      .attr('class', 'y gridlines') // See CSS at top of file!!!
+      .attr('transform',`translate(${margins.left-10},${margins.top})`)
+      .lower()
+      .call(leftGridlines);
+    // Make sure to set a gridlines class so you can distinguish it from your axes when styling
     
     
+    // The real benefit is that you can use the same configurations on your gridline axis that you used on your label axis. For example, we can put a tick number here
+    let bottomGridlines = d3.axisBottom(gdpScale)
+                            .tickSize(-chartHeight-10)
+                            .tickFormat('')
+                            .ticks(6); // Borrowing from our axis labels
+    svg.append('g')
+      .attr('class', 'x gridlines') // See CSS at top of file!!!
+      .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
+      .lower()
+      .call(bottomGridlines);
+      
+
+    // NOTE: Our gridlines show up on top of the points. In practice you'll want to draw the circles last, or make an SVG group to hold the axes and then make your chart group after.
+    // A quick solution would be to add .lower() to the axis G tags to put them to the bottom of the G tag. That's what we did in class
     
-    
-    
+    // You can also use .raise() to push stuff to the top if it is underneath things 
+    //  We can do that here to put the circles on top
+    //  chartArea.raise()
+
     // Next up: filtering, legends, and advanced formatting
-    
     
 
     
