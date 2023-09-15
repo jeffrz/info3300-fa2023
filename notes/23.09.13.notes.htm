@@ -185,7 +185,9 @@
     // ---- 3
     // 5. Let's add some axes
     // We're going to use D3's axis tools to do it
-    let leftAxis = d3.axisLeft(lifeScale);
+    let leftAxis = d3.axisLeft(lifeScale); // d3.axis____ functions return a *function* that pastes axis labels
+                                           //  on demand. You just run the function on a d3 selection and it
+                                           //  will insert all sorts of labels and markers for you
     svg.append('g')
       .attr('class', 'y axis')
       .attr('transform',`translate(${margins.left-10},${margins.top})`) 
