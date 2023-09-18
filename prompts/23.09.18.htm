@@ -1,0 +1,350 @@
+<html><head>
+<title>INFO 3300 - September 18</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <style>
+  
+    .legend span {
+      margin-right: 10px;
+    }
+      
+    .gridlines line {
+      stroke: #bbb;
+    }
+    
+    .gridlines .domain {
+      stroke: none;
+    }
+    
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for September 18</h3>
+  <p>
+    Today we're looking at data joins. There are now two different ways to do a data join in d3.<br/>
+     <a href="https://observablehq.com/@d3/selection-join">This page</a> demonstrates the "new" way to do joins.<br/>
+     While <a href="https://bost.ocks.org/mike/join/">another page</a> demonstrates the "old" style of join.
+  </p>
+  <p>
+     For this class the .join("elementName") pattern in a new style data join is often enough. You will start to use the .join(enter => {}, update => {}, exit => {} ) pattern when you have animated transitions or more involved steps in creating elements.
+  </p>
+  <p>
+    If you're still confused about why we use translate to make scatterplots, Mike Bostock has a <a href="https://observablehq.com/@d3/margin-convention">handy page discussing chart margins</a>.
+  </p>
+
+  <h5>HTML for today:</h5>
+  
+    <p style="margin-top: 50px;">Data join demo:</p>
+    <svg id="joinDemo" height="100" width="500" style="border: 1px solid black;" >
+      
+      
+    </svg>
+    
+    <pre id="textSimulation">[ - - - - - - - - - ]</pre>
+
+    <p style="margin-top: 50px;">Scatterplot:</p>
+    
+    <svg id="scatterplot" height="400" width="600" style="margin-top:50px" >
+      <text id="label" x="590" y="5"  text-anchor="end" alignment-baseline="hanging"></text>
+    </svg>
+    
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+  <pre>
+    <code id="display2" class="hljs javascript">
+    </code>
+  </pre>
+  
+  <!--- Code for today's class --->
+  <script id="notes1">
+
+
+  // 0. Let's check out d3 joins
+  const demo = d3.select("svg#joinDemo");
+  
+  // You can also use colors as a range in a d3 scale object!
+  // Best if you make use of d3.rgb here
+  // You also need to assign a function to blend the two colors with d3.interpolate()
+  //  d3.interpolateHcl is almost always a safe bet
+  let colorScale = d3.scaleLinear().domain([1,7])
+                                   .range([d3.rgb("#a008f2"), d3.rgb("#f9d6ec")])
+                                   .interpolate(d3.interpolateHcl);
+  
+  
+  
+  
+  // This function is triggered every 800ms by the animation that I developed (see bottom of file)
+  // Each tick of the animation changes the "circles" array slightly
+  //  First, each circle gets 1 "age" older
+  //  If a circle is over age 7, then it is removed
+  //  A new circle is always added to the right of the newest one
+  // We want updateChart to draw a SVG circle for each element in the "circles" array onto our page
+  // Done right, the circles being drawn and cleared will create the illusion of movement
+  
+  // So we have new circle elements to add, some circles to remove, and old ones to update
+  // An old forEach loop would be hard to implement here, because we'd have to wipe the SVG clear each time
+  // Instead, we use d3 data joins to simplify the process dramatically
+  function updateChart(circles) {
+    
+    // Check out how the circles array changes over time
+    console.log(circles);
+    console.log(plaintextTicks(circles))
+    
+    
+    // 1. Old way
+  
+    
+    
+    
+    // 2. New way - shorthand version
+    
+    
+       
+       
+    // 3. New way - extended version
+    //  You'll use this one when you have custom behavior for circles being added, changed, or removed
+    //     (a good example of this is animating when circles enter and exit the canvas -- we'll do something like this in coming weeks )
+    
+    
+       
+               
+    
+    
+  }
+  
+  
+
+  </script>
+  
+  
+  
+  
+  <script id="notes2">
+  
+  
+  // ------ We're going to edit some code to use a data join ------
+  //   Scroll down to the forEach!
+
+  // ---- 1
+  // 0. Let's make a fancy scatterplot
+  const svg = d3.select("svg#scatterplot");
+  
+  const width = svg.attr("width");
+  const height = svg.attr("height");
+  const margin = {top: 10, right: 10, bottom: 50, left: 50};
+  
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  // This time we'll use another layer to make sure things stay ordered properly
+  //  Remember that SVG draws from the top down, layering things on top of one another
+  let annotations = svg.append("g").attr("id","annotations");
+                  // No translate here since our annotations may be outside of the chart area
+                  
+  let chartArea = svg.append("g").attr("id","points")
+                  .attr("transform","translate("+margin.left+","+margin.top+")");
+
+  // Make sure the text label is on the top using raise()
+  d3.select("#label").raise();
+
+
+  // Import some CSV data
+  //   This time we'll use the autoType
+  // d3.autoType will try to do type coercion to make strings into numbers, etc
+  //  but it is very cautious and will give up if anything fails to coerce
+  // Check documentation to see the heuristics it uses
+  
+  d3.csv("../datasets/blockbusters.csv", d3.autoType )
+    .then( (data) => {
+    
+  data.forEach( d => {
+    d['worldwide_gross'] = Number( d['worldwide_gross'].replace(/,/g, "").replace(/\$/g,"") );
+    
+  });
+
+  const yearExtent = d3.extent(data, d => d['year']);
+  const yearScale = d3.scaleLinear().domain(yearExtent).range([0, chartWidth]);
+  const grossExtent = d3.extent(data, d => d['worldwide_gross']);
+  const grossScale = d3.scaleLog().domain(grossExtent).range([chartHeight, 0]);
+  const imdbExtent = d3.extent(data, d => d['imdb_rating']);
+  const imdbScale = d3.scaleLinear().domain(imdbExtent).range([3,8]);
+  
+  let leftAxis = d3.axisLeft(grossScale)
+                   .tickFormat(d3.format("$.0s"));  // shorter scientific notation with a dollar sign in front
+  let leftGridlines = d3.axisLeft(grossScale)
+                        .tickSize(-chartWidth-10)
+                        .tickFormat("")
+  let bottomAxis = d3.axisBottom(yearScale)
+                     .tickFormat(d3.format("~f"));  // exact value without commas
+  let bottomGridlines = d3.axisBottom(yearScale)
+                          .tickSize(-chartHeight-10)
+                          .tickFormat("")
+  annotations.append("g")
+    .attr("class", "y axis")
+    .attr("transform","translate("+(margin.left-10)+","+margin.top+")")
+    .call(leftAxis)
+  annotations.append("g")
+    .attr("class", "y gridlines")
+    .attr("transform","translate("+(margin.left-10)+","+margin.top+")")
+    .call(leftGridlines);
+  annotations.append("g")
+    .attr("class", "x axis")
+    .attr("transform","translate("+margin.left+","+(chartHeight+margin.top+10)+")")
+    .call(bottomAxis);
+  annotations.append("g")
+    .attr("class", "x gridlines")
+    .attr("transform","translate("+margin.left+","+(chartHeight+margin.top+10)+")")
+    .call(bottomGridlines);
+    
+    
+  
+  // CONVERT TO USE A DATA JOIN
+  data.forEach( (d, i) => {
+    
+    let circle = chartArea.append("circle")
+        .attr("cx", yearScale(d['year']))
+        .attr("cy", grossScale(d['worldwide_gross']+1))
+        .attr("r", imdbScale(d['imdb_rating']))
+        .attr("opacity", 0.8)
+        .attr("label", d["title"])  
+
+  });
+  // done with forEach
+  
+  
+  });
+  
+  </script>
+  
+  <script>
+  
+  // ----- Helper functions for today's lesson -----
+  // Configure the simulation here
+  // numCircles is also the age at which circles are removed
+  const numCircles = 7;
+  // how many empty spots you want to have in your visuals
+  const emptySpots = 4;
+  // the size of the viewport -- we can make it smaller than numCircles+emptySpots to make it look like it takes time to wrap around
+  //  setting it to numCircles+emptySpots makes things immediately wrap around the SVG
+  const viewport = 9;  // for wraparound use numCircles + emptySpots
+  // space between circles
+  const xSpacing = 50;
+  const yPos = 50;
+  // don't modify
+  const maxLen = (numCircles + emptySpots) * xSpacing;
+  
+  // Simulation lives here
+  var circles = [];
+  
+  // Steps the simulation one step forward, adding and removing elements as necessary
+  var tick = function() {
+      
+    for (let i=0; i<circles.length; i++) {
+      // Update circle age
+      circles[i]['age'] = circles[i]['age'] + 1;
+    }
+    // If we have numCircles, remove the oldest one
+    if (circles.length >= numCircles) {
+      circles.shift();
+    }
+    // Always add a circle positioned after the most recent one
+    let element;
+    if (circles.length === 0) {
+      element = { x: xSpacing, y: yPos, age: 1 };
+    }
+    else {
+      let recent = circles[circles.length-1];
+      element = { x: xSpacing + (recent.x % maxLen), y: yPos, age: 1 };
+    }
+    circles.push(element);
+    
+    // Update for viewport
+    let view = [];
+    for (let i=0; i<circles.length; i++) {
+      if ( Math.floor(circles[i]['x'] / xSpacing) <= viewport ) {
+        view.push(circles[i]);
+      }
+     }
+    
+    updateChart(view); // This goes to the data join function
+    
+    // This is a helper to print out the text version for reference
+    d3.select("#textSimulation").text( plaintextTicks(circles) );
+    
+  }
+  
+  // This function makes a user-friendly text version of the simulation
+  //  e.g. [ - 7 6 5 4 3 2 1 - - - ]
+  // When a number is provided, that's the "age" of the circle
+  function plaintextTicks(data) {
+      let dir = [];
+      for (let i=0; i<viewport; i++) {
+          dir.push('-');
+      }
+      data.forEach( d => {
+        if ( Math.floor(d.x / xSpacing) <= viewport ) {
+          let pos = (d.x / xSpacing) - 1;
+          dir[pos] = d.age;
+        }
+      })
+      return '[ ' + dir.join(' ') + ' ]';
+  }
+  
+  // setInterval causes a function (tick in this case) to be run every X milliseconds. It will do this forever unless you stop it
+  setInterval( tick, 800 );
+  
+  
+  
+
+  // HELPER FUNCTION
+  //  lighten a color a little bit using d3 color functions
+  function lighten(color) {
+      
+      let hclColor = d3.hcl(color);
+      let luma = Math.min(130, hclColor.l + 30);
+      return d3.rgb( d3.hcl( hclColor.h, hclColor.c, luma ) );
+    
+  }
+
+  
+  </script>
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    document.getElementById("display2").innerHTML = sanitize( document.getElementById("notes2").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
