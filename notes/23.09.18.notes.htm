@@ -90,13 +90,11 @@
                                    .interpolate(d3.interpolateHcl);
   
   
-  
-  
   // This function is triggered every 800ms by the animation that I developed (see bottom of file)
   // Each tick of the animation changes the "circles" array slightly
   //  First, each circle gets 1 "age" older
   //  If a circle is over age 7, then it is removed
-  //  A new circle is always added to the right of the newest one
+  //  A new circle is always added to the right of the newest one, looping around when it gets to the end
   // We want updateChart to draw a SVG circle for each element in the "circles" array onto our page
   // Done right, the circles being drawn and cleared will create the illusion of movement
   
@@ -106,28 +104,76 @@
   function updateChart(circles) {
     
     // Check out how the circles array changes over time
-    console.log(circles);
-    console.log(plaintextTicks(circles))
-    
+    //console.log(circles);
+    //console.log(plaintextTicks(circles))
     
     // 1. Old way
-  
+    let elements = demo.selectAll("circle")
+                       .data(circles);
+                       // .data initiates a data join
+                       // d3 will look at what the .selectAll returned (it's often empty at the start)
+                       //  and compare it to the stuff you give .data().
+                       // It tries to match up elements one-to-one with elements in the data
+                       // Once it's done the join, you get access to functions based on the results
+    
+    // Exit => remove stuff
+    //  .exit() returns a set of elements that are in the selectAll but no longer match anything in the .data()
+    //  These should be removed
+    elements.exit()
+            .remove();
+    
+    // Enter => stuff you need to make
+    //  .enter() returns a set of virtual elements that don't exist yet, but should exist because there are new things in .data()
+    //  These should be added                   
+    elements.enter()
+            .append("circle")
+            .attr("r", 20)
+          // Update
+          // Since .enter() only gave the new items, if we want to be able to style _everything_ from selectAll, we need to call .merge()
+          //  .merge() will add any new objects from elements into the set you've made with .enter()
+          // This means anything in the chain after the merge will affect all of the entities you've mapped to data elements
+            .merge(elements)
+            .attr("cx", d => d['x'] )
+            .attr("cy", d => d['y'] )
+            .attr("fill", d => colorScale(d.age));
     
     
-    
-    // 2. New way - shorthand version
-    
-    
-       
+    // 2. New way - shorthand version - what you'll use most often
+    demo.selectAll("circle").data(circles)
+        .join("circle") // If you give join an element name like "rect" or "circle", it uses defaults for
+                        //  enter, update, and exit which add one of those elements or remove them as 
+                        //  necessary. Its guesses are usually correct. Style stuff after the join
+        .attr("r", 20)
+        .attr("fill", d => colorScale(d.age) )
+        .attr("cx", d => d['x'] )
+        .attr("cy", d => d['y'] );
        
     // 3. New way - extended version
     //  You'll use this one when you have custom behavior for circles being added, changed, or removed
     //     (a good example of this is animating when circles enter and exit the canvas -- we'll do something like this in coming weeks )
-    
-    
+    demo.selectAll("circle").data(circles)
+        .join(  // .join() is a shortcut for handling the enter, update, and exit parts of a data join. Each is a parameter for join
+          enter => { // the Enter parameter should be a function -- the function gets a parameter, enter, containing the set of stuff to create
+            enter.append("circle")
+                    .attr("r", 20)
+                    .attr("fill", d => colorScale(d.age) )
+                    .attr("cx", d => d['x'] )
+                    .attr("cy", d => d['y'] );
+          },
+          update => update
+                      .attr("cx", d => d['x'] )
+                      .attr("cy", d => d['y'] )
+                      .attr("fill", d => colorScale(d.age)), 
+          // the Update parameter should be a function -- the function gets a parameter, update, containing the set of stuff that already exists and might need updating (but it does not include points you just created in enter)
+          exit => { // the Exit parameter should be a function -- the function gets a parameter, exit, containing the set of stuff to remove
+                    // Usually Exit is just for removing, but you can also use .transition() to animate removing things for special effects
+            exit.remove() 
+          }
+        );
+        
+    // Avoid using .transition() within an extended join unless you know exactly what you are doing
+    // It can easily interrupt the data join process
        
-               
-    
     
   }
   
@@ -143,61 +189,42 @@
   
   // ------ We're going to edit some code to use a data join ------
   //   Scroll down to the forEach!
-
-  // ---- 1
-  // 0. Let's make a fancy scatterplot
-  const svg = d3.select("svg#scatterplot");
   
+  const svg = d3.select("svg#scatterplot");
   const width = svg.attr("width");
   const height = svg.attr("height");
   const margin = {top: 10, right: 10, bottom: 50, left: 50};
-  
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
-  // This time we'll use another layer to make sure things stay ordered properly
-  //  Remember that SVG draws from the top down, layering things on top of one another
   let annotations = svg.append("g").attr("id","annotations");
-                  // No translate here since our annotations may be outside of the chart area
-                  
   let chartArea = svg.append("g").attr("id","points")
                   .attr("transform","translate("+margin.left+","+margin.top+")");
 
-  // Make sure the text label is on the top using raise()
-  d3.select("#label").raise();
-
-
   // Import some CSV data
-  //   This time we'll use the autoType
-  // d3.autoType will try to do type coercion to make strings into numbers, etc
-  //  but it is very cautious and will give up if anything fails to coerce
-  // Check documentation to see the heuristics it uses
-  
-  d3.csv("../datasets/blockbusters.csv", d3.autoType )
+  d3.csv("../datasets/blockbusters.csv", d3.autoType)
     .then( (data) => {
-    
+  
+  // Check for data issues
   data.forEach( d => {
-    d['worldwide_gross'] = Number( d['worldwide_gross'].replace(/,/g, "").replace(/\$/g,"") );
-    
+    d['worldwide_gross'] =  Number(d['worldwide_gross'].replace(/,/g,"").replace(/\$/g,""));
   });
-
+  
+  // Scales
   const yearExtent = d3.extent(data, d => d['year']);
   const yearScale = d3.scaleLinear().domain(yearExtent).range([0, chartWidth]);
   const grossExtent = d3.extent(data, d => d['worldwide_gross']);
   const grossScale = d3.scaleLog().domain(grossExtent).range([chartHeight, 0]);
   const imdbExtent = d3.extent(data, d => d['imdb_rating']);
   const imdbScale = d3.scaleLinear().domain(imdbExtent).range([3,8]);
+  const genreScale = d3.scaleOrdinal(d3.schemeCategory10);
   
+  // Y axis
   let leftAxis = d3.axisLeft(grossScale)
-                   .tickFormat(d3.format("$.0s"));  // shorter scientific notation with a dollar sign in front
+                   .tickFormat(d3.format("$.0s"))
   let leftGridlines = d3.axisLeft(grossScale)
                         .tickSize(-chartWidth-10)
                         .tickFormat("")
-  let bottomAxis = d3.axisBottom(yearScale)
-                     .tickFormat(d3.format("~f"));  // exact value without commas
-  let bottomGridlines = d3.axisBottom(yearScale)
-                          .tickSize(-chartHeight-10)
-                          .tickFormat("")
   annotations.append("g")
     .attr("class", "y axis")
     .attr("transform","translate("+(margin.left-10)+","+margin.top+")")
@@ -206,6 +233,13 @@
     .attr("class", "y gridlines")
     .attr("transform","translate("+(margin.left-10)+","+margin.top+")")
     .call(leftGridlines);
+  
+  // X axis
+  let bottomAxis = d3.axisBottom(yearScale)
+                     .tickFormat(d3.format("~f"));
+  let bottomGridlines = d3.axisBottom(yearScale)
+                          .tickSize(-chartHeight-10)
+                          .tickFormat("")
   annotations.append("g")
     .attr("class", "x axis")
     .attr("transform","translate("+margin.left+","+(chartHeight+margin.top+10)+")")
@@ -214,22 +248,34 @@
     .attr("class", "x gridlines")
     .attr("transform","translate("+margin.left+","+(chartHeight+margin.top+10)+")")
     .call(bottomGridlines);
-    
-    
   
-  // CONVERT TO USE A DATA JOIN
-  data.forEach( (d, i) => {
-    
-    let circle = chartArea.append("circle")
-        .attr("cx", yearScale(d['year']))
-        .attr("cy", grossScale(d['worldwide_gross']+1))
-        .attr("r", imdbScale(d['imdb_rating']))
-        .attr("opacity", 0.8)
-        .attr("label", d["title"])  
-
-  });
-  // done with forEach
   
+  // 1. Eliminate the data.forEach( (d, i) => { } )
+  
+  //  Update it using a data join!
+  //  We can replace the .forEach with a .data().join() call
+  //  While in the .forEach we had our own function (d, i) => {}, in the join things work differently
+  //  We make use of the fact that commands like .attr and .style can access the element's data value
+  //   in order to dynamically apply styles based on data -- this is d3's main selling point
+  //  Though we use "d" here by convention, we're just putting a function into the second parameter of
+  //   .attr() instead of a fixed value. The function has one parameter, the data row for that element
+  let circles = chartArea.selectAll("circle").data(data)
+                         .join("circle")
+                         .attr("cx", d => yearScale(d['year']))
+                         .attr("cy", d => grossScale(d['worldwide_gross']+1))
+                         .attr("r", d => imdbScale(d['imdb_rating']))
+                         .style("fill", d => genreScale(d['Main_Genre']))
+                         .attr("opacity", 0.8);
+    
+                         
+   // 2. Add some mouseovers
+   //    Mouseover triggers when mouse enters object's region
+   //    Mouseout triggers when mouse leaves the object's region
+   //  WARNING: Avoid placing new elements on top of an object when using mouseover
+   //           This can cause the two objects to fight, creating oscillating patterns                      
+   
+   
+    
   
   });
   
