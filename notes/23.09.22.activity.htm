@@ -1,0 +1,129 @@
+<html>
+<head>
+  <title>INFO 3300 - Visualization Brainstorm Activity</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <meta charset="utf-8">
+</head>
+<body class="larger-font">
+  <div class="container larger">
+    <h4>INFO 3300 - Visualization Brainstorm Activity</h4>
+    
+    <div class="doc-section">
+      <h5 style="padding-top:0;">Instructions</h5>
+      <p>
+        In this activity we will brainstorm visualizations for dealing with some complex data related to streaming music habits over time. Here are the rules:
+        <ul>
+          <li>Effectively visualize some aspect of the dataset for users. You will not be able to visualize everything. You are not required to show all of the data, but data related to time must be a component of your final design.</li>
+          <li>This visualization will be interactive. Add as much or as little as you want.</li>
+          <li>You may not design something that requires users to watch an animation or press a play button -- they should be able to visit the page and immediately see some information.</li>
+          <li>Consider how best to manage the information that a user sees. Don't try to throw everything at the problem. Instead, be cautious in how you include new visual elements and interactions. <strong>You should be able to justify every design decision you make</strong>.</li>
+          <li>Note that you may design for mobile multi-touch devices or traditional desktop platforms. Pick one as a group.</li>
+        </ul> 
+      </p>
+      <p>
+        Please follow this procedure:
+      </p>
+        <strong>Step 1 - 7 minutes - [GROUP] Identify Key Goals</strong>
+        <ol class="narrow-list">
+          <li>As a group, read the instructions and <strong>Brief</strong> included below.</li>
+          <li>Together, take a look at the <strong>Domain Task section</strong> and identify <strong>between 3 and 5 domain tasks</strong> that you want to help users do through your visualization.</li>
+          <li>Rank those tasks in order of importance using any method you'd like (e.g. voting, by consensus)</li>
+        </ol>
+        <br/>
+        <strong>Step 2 - 10 minutes - [INDIVIDUAL] Two sketches</strong>
+        <ol class="narrow-list">
+          <li>Now, working individually, begin making <strong>two very rough visualization sketches</strong> that best satisfy those tasks. Keep them low fidelity. You can use any medium you like (e.g.pen and paper, tablets, UI prototyping software, presentation tools, a whiteboard).</li>
+          <li>Refer back to the <strong>dataset</strong> and think about what you want to show.</li>
+          <li>Keep polishing your ideas until your group reconvenes.</li>
+        </ol>
+        <br/>
+        <strong>Step 3 - 23 minutes - [GROUP] Final design</strong>
+        <ol class="narrow-list">
+          <li>As a group, go around and discuss each person's sketches. Keep it to 1 minute per sketch.</li>
+          <li>Working together, create a <strong>consensus sketch</strong>.</li>
+          <!--- <li>Once you've finished your sketch, <strong>have one group member take a picture of it and upload it to CMS under the "Sep 22 Activity" assignment.</strong>. This is not for graded credit -- it's just to give us an idea of what ideas people came up with and to create a gallery for the class to browse.</li> --->
+          <li>We will reconvene at the end to check out everyone's ideas.</li>
+        </ol>
+      </p>
+      
+    </div>
+    
+    
+    <div class="doc-section" >
+      <h5 style="padding-top:0;">Your brief:</h5>
+      <p>
+        Your goal is to build an interactive visualization that helps people <strong>understand how their music listening habits have changed over time</strong>. A person might have started their web streaming account by listening mopey goth metal out of tween-age rebellion, only to transition to popular radio hits as they grew up. Maybe their tastes changed as particular close friends or their partners introduced them to new bands. Their tastes might also have just changed with the time and trends. There are any number of reasons someone might want to visualize their listening history. User goals might be to identify preferred artists/genres of the year, describe how someone’s tastes have changed, highlight the influence of others in shaping their music interests, reminisce about past bad listening decisions, see deeper connections between the musicians they choose, identify potential new music to which to listen, or find other people who have similar tastes to theirs over time. Feel free to focus on individual-, group- or country-level info. Choose whatever granularity of time you feel is appropriate as well.
+      </p>
+      <p>
+        For this task we are using an imaginary dataset. Imagine that you have ultra-precise analytics from a platform like Spotify for a person's lifetime of music listening habits, even including things like geography and music that was played in their environment. You can aggregate information, for example getting time spans where a genre was played often or the average popularity of the music a person listened to each year. You also have access to the same data for social networking service friends and can compute intersections to see where and when tastes might have overlapped on any of those metrics. You do not need to use all of the different data components. 
+      </p>
+      <table>
+        <tr><td><strong>Songs Streamed:</strong></td><td></td></tr>
+        <tr><td> Time stamp when streaming started </td><td>  </td></tr>
+        <tr><td> Song duration </td><td>   </td></tr>
+        <tr><td> % of song listened </td><td>   </td></tr>
+        <tr><td> Artist </td><td>   </td></tr>
+        <tr><td> Genre  </td><td>  (hierarchical data, e.g. rock -> punk rock -> new wave) </td></tr>
+        <tr><td> Release date </td><td>   </td></tr>
+        <tr><td> Popularity by date</td><td> (could be rankings, number of records sold, etc)  </td></tr>
+        <tr><td> Review ratings </td><td>   </td></tr>
+        <tr><td> Geolocation </td><td>   </td></tr>
+        <tr><td><strong>Artists:</strong></td><td>   </td></tr>
+        <tr><td> List of songs  </td><td> w/timestamps & albums </td></tr>
+        <tr><td> Demographics </td><td> (age, gender identity, country of origin, etc)  </td></tr>
+        <tr><td> Number of listens / popularity by date </td><td>   </td></tr>
+        <tr><td> Years active </td><td> (w/popularity over the years)  </td></tr>
+        <tr><td> Active genres </td><td>   </td></tr>
+        <tr><td> Connections to related artists </td><td>   </td></tr>
+        <tr><td> <strong>Genres:</strong> </td><td>   </td></tr>
+        <tr><td> Songs and artists in genre </td><td>  </td></tr>
+        <tr><td> Number of listens / popularity by date</td><td>  </td></tr>
+        <tr><td> Subgenres, hierarchical data</td><td>  </td></tr>
+        <tr><td> Time period where genre active</td><td>  </td></tr>
+        <tr><td> <strong>Geography:</strong> </td><td>   </td></tr>
+        <tr><td> Timestamped song listens in area </td><td>  </td></tr>
+        <tr><td> Popular artists, genres etc. </td><td>  </td></tr>
+        <tr><td> Dwell time for person in area </td><td>  </td></tr>
+        <tr><td> Type of events held in area </td><td>  </td></tr>
+        <tr><td> <strong>SNS Friends:</strong></td><td>  </td></tr>
+        <tr><td> Tie strength to subject</td><td>  </td></tr>
+        <tr><td> Their song data</td><td>  </td></tr>
+        <tr><td> Overlap in songs, genres etc</td><td>  </td></tr>
+      </table>
+      <p>Remember: <strong>Do not try to visualize all of these attributes</strong>.
+    </div>
+    
+    <div class="doc-section" >
+      <h5 style="padding-top:0;">Domain tasks</h5>
+      <p style="margin-top:30px">Choose between 3 and 5 domain tasks that are most important for making sense of trends over time and rank them in order of importance.</p>
+      <ul>
+        <li>What were your most popular songs at time instant/interval T?</li>
+        <li>What were your most popular artists at time instant/interval T?</li>
+        <li>What were your most popular genres at time instant/interval T?</li>
+        <li>Where did you listen to music at time instant/interval T?</li>
+        <li>How did your song choices tastes change over time?</li>
+        <li>How did your preferred artists change over time?</li>
+        <li>How did your preferred genres change over time?</li>
+        <li>What was your most embarrassing music listening time period (e.g. the Grand Funk Railroad years)?</li>
+        <li>Did you listen to popular or unusual songs at time instant/interval T?</li>
+        <li>Did you recognize any songs, artists, or genres “before they were cool”?</li>
+        <li>How do your preferred songs at a given time connect to preferred songs at another time period?</li>
+        <li>How do your preferred artists at a given time connect to preferred artists at another time period?</li>
+        <li>How do your preferred genres at a given time connect to preferred genres at another time period?</li>
+        <li>Are there any songs/genres/artists that you have consistently listened to over a long time period?</li>
+        <li>Do your listening habits have any periodic characteristics (e.g. angsty music during prelims)?</li>
+        <li>How do your listening habits compare to those of your friends over time?</li>
+        <li>How and when do your tastes connect to friends’ tastes, and why do they connect?</li>
+        <li>Did a song, artist, or genre diffuse over your friend group from one person to another?</li>
+        <li>What friends are most like/unlike you in terms of musical tastes at time instant/interval T?</li>
+        <li>How do your choice of song, artist, or genre relate to world event or life milestones?</li>
+        <li>[CREATE YOUR OWN DOMAIN TASK #1]</li>
+        <li>[CREATE YOUR OWN DOMAIN TASK #2]</li>
+      </ul>
+    </div>
+  </div>
+</body>
+    
