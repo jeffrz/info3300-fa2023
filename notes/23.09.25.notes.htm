@@ -1,0 +1,151 @@
+<html><head>
+<title>INFO 3300 - September 25</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <style>
+  
+    
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for September 25</h3>
+  <p>
+    The dataset on this page comes from an interesting <a href="https://www.kaggle.com/ucsandiego/carbon-dioxide">dataset on Kaggle</a> about atmospheric CO2 concentrations. I'm using it for demo purposes and can't speak to the veracity of the data.
+  </p>
+  <p>
+    Today we're looking at d3 line plots. They also use a data join, but it's a bit trickier to implement. <a href="https://github.com/d3/d3-shape">Here</a> is some documentation on d3.shape, the library used for making line charts, and <a href="https://github.com/d3/d3-time-format">here</a> is the documentation on d3.time. Recall what we learned at the start of class on SVG <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths">paths</a>.
+  </p>
+  <p>
+    If you examine old examples of d3 mouseovers, you may see them using d3.mouse(). That changed in version 6. You can read <a href="https://observablehq.com/@d3/d3v6-migration-guide#pointer">this guide</a> to learn how to translate older v5 examples.
+  </p>
+  <p>
+    If you're still confused about why we use translate and G tags in layout out charts, Mike Bostock has a <a href="https://bl.ocks.org/mbostock/3019563">handy page discussing chart margins</a>.
+  </p>
+
+  <h5>HTML for today:</h5>
+  
+  <svg id="lineplot" height="500" width="800" style="margin-top:50px" >
+  </svg>
+  
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+  <!--- Code for today's class --->
+  <script id="notes1">
+
+  // Do the usual things to set up the chart area and incorporate margins
+  const svg = d3.select("svg#lineplot");
+  const width = svg.attr("width");
+  const height = svg.attr("height");
+  const margin = {top: 10, right: 10, bottom: 50, left: 50};
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  let annotations = svg.append("g").attr("id","annotations");
+  let chartArea = svg.append("g").attr("id","points")
+                  .attr("transform",`translate(${margin.left},${margin.top})`);
+
+  // Import some CSV data
+  d3.csv("../datasets/co2.csv", d3.autoType)
+    .then( (data) => {
+      
+  // 1. Check data quality
+  console.log(data)
+  
+  
+  // 2. Scales, axes, and gridlines
+  
+  // Y Axis  
+  // I'll take care of the easy one for us
+  const carbonExtent = d3.extent(data, d => d['Carbon Dioxide (ppm)']);
+  const carbonScale = d3.scaleLinear().domain(carbonExtent).range([chartHeight, 0]);
+  
+  let leftAxis = d3.axisLeft(carbonScale)
+  let leftGridlines = d3.axisLeft(carbonScale)
+                        .tickSize(-chartWidth-10)
+                        .tickFormat("")
+  annotations.append("g")
+             .attr("class", "y axis")
+             .attr("transform",`translate(${margin.left-10},${margin.top})`)
+             .call(leftAxis)
+  annotations.append("g")
+             .attr("class", "y gridlines")
+             .attr("transform",`translate(${margin.left-10},${margin.top})`)
+             .call(leftGridlines);
+
+  // X Axis
+  
+  
+  // 3. Before we start drawing, we need a line generator
+  //  this will help us to draw the path based on data, which otherwise is very complicated
+  
+  
+  
+  // 4. Append a <path>, bind the data, and run the generator 
+  
+  
+  
+  // 5. Let's add some circles too!
+  
+  
+  
+  
+  
+  // STRETCH GOAL HERE
+  
+  
+  
+  // end of .then()
+  });  
+  
+  
+  
+  
+  
+  
+  </script>
+  
+  
+  
+  
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
