@@ -217,7 +217,7 @@
   const grossScale = d3.scaleLog().domain(grossExtent).range([chartHeight, 0]);
   const imdbExtent = d3.extent(data, d => d['imdb_rating']);
   const imdbScale = d3.scaleLinear().domain(imdbExtent).range([3,8]);
-  const genreScale = d3.scaleOrdinal(d3.schemeCategory10);
+  const genreScale = d3.scaleOrdinal( d3.schemeCategory10 )
   
   // Y axis
   let leftAxis = d3.axisLeft(grossScale)
@@ -264,9 +264,10 @@
                          .attr("cx", d => yearScale(d['year']))
                          .attr("cy", d => grossScale(d['worldwide_gross']+1))
                          .attr("r", d => imdbScale(d['imdb_rating']))
-                         .style("fill", d => genreScale(d['Main_Genre']))
+                         .style("fill", d => genreScale(d['Main_Genre']) )
                          .attr("opacity", 0.8);
     
+    console.log( genreScale.domain() )
                          
    // 2. Add some mouseovers
    //    Mouseover triggers when mouse enters object's region
@@ -274,7 +275,40 @@
    //  WARNING: Avoid placing new elements on top of an object when using mouseover
    //           This can cause the two objects to fight, creating oscillating patterns                      
    
+   console.log(circles)
    
+   d3.select("#label").raise()
+   
+   
+   circles.on("mouseover", function( event ) {
+     console.log(event);
+     
+     d3.select(this)
+       .transition().duration(200)
+       .attr("stroke-width", 4)
+       .attr("stroke", "black")
+       .style("fill", d => lighten(genreScale(d['Main_Genre'])));
+    
+    let d = d3.select(this).datum()
+    console.log(d)
+       
+    d3.select("#label")
+      .text( d['title'] );
+     
+   });
+   
+   circles.on("mouseout", function( event ) {
+     console.log(event);
+     
+     d3.select(this)
+       .transition().duration(200)
+       .attr("stroke-width", 0)
+       .attr("stroke", "")
+       .style("fill", d => genreScale(d['Main_Genre']) );
+       
+     d3.select("#label")
+       .text( "" );
+   });
     
   
   });
