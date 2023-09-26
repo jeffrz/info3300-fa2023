@@ -1,0 +1,124 @@
+<html><head>
+<title>INFO 3300 - September 27</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <style>
+  
+  .gridlines .domain {
+    display: none;
+  }
+  
+  .gridlines line {
+    stroke: #444;
+  }
+    
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for September 27</h3>
+  <p>
+    In this lecture we'll explore why d3 data joins (<a href="https://observablehq.com/@d3/learn-d3-joins">demos here</a>) add flexibility to our code and see some of the neat ways we can smoothen out transitions. To do this, we'll make a bar chart using <a href="https://observablehq.com/@d3/d3-scaleband">scaleBand</a>.
+  </p>
+  <p>
+    The dataset for this page comes from the <a href='http://bechdeltest.com/'>Bechdel Test Database</a> where users categories movies based on whether they have (1) at least two characters who identify as women in it (2) who talk to each other (3) about something besides a man. The idea behind the test is to characterize gender representation and equity in films. Though it's called a "test", one might better think of it as a way to audit movies as a whole, as it's a very coarse measure for representation. You can see some more analyses and additional context in this <a href="https://fivethirtyeight.com/features/the-dollar-and-cents-case-against-hollywoods-exclusion-of-women/">FiveThirtyEight article</a>. For our purposes, I've aggregated movie ratings along different decades of release. A genre is counted if more than 20 films have been rated in that category (whether pass or fail).
+  </p>
+
+  <h5>HTML for today:</h5>
+  
+  <svg id="barchart" height="500" width="800" style="margin-top:50px" >
+  </svg>
+  <!--- For a certain homework remember that we just want span tags and not fancy buttons --->
+  <div id="button-bar"></div>
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+  <!--- Code for today's class --->
+  <script id="notes1">
+
+  // Do the usual things to set up the chart area and incorporate margins
+  const svg = d3.select("svg#barchart");
+  const width = svg.attr("width");
+  const height = svg.attr("height");
+  const margin = {top: 10, right: 10, bottom: 50, left: 50};
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  let annotations = svg.append("g").attr("id","annotations");
+  let chartArea = svg.append("g").attr("id","points")
+                  .attr("transform",`translate(${margin.left},${margin.top})`);
+
+  // Import some JSON data
+  d3.json("../datasets/bechdeltest-by-genre.json", d3.autoType)
+    .then( (yearData) => {
+      
+  console.log(yearData);
+  
+  
+  // To start: Make a single bar chart for one of the year ranges
+  
+  
+  
+  
+  
+  // Now add buttons and make interactive version
+  
+  
+  
+  
+  // Stretch goal: Animate it!
+  
+  
+  
+  });  
+  
+  
+  
+  
+  
+  
+  </script>
+  
+  
+  
+  
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
