@@ -203,7 +203,10 @@
       // FOR Friday:
       // Something is going on, still... Take a look between a few decades and think about how the rectangles
       //  are being re-used by the data join. Are they consistent? Does it match what the axis labels do?
-      chartArea.selectAll('rect.bar').data( data  )
+      // To solve this, we added d => d['genre'] to the data join
+      // This forces the join to make sure that the same genres are applied
+      //  to the same rect elements across the join to maintain consistency
+      chartArea.selectAll('rect.bar').data( data, d => d['genre']  )
                .join( enter => enter.append('rect')
                                     .attr('class','bar')
                                     .attr("fill", "steelblue")
