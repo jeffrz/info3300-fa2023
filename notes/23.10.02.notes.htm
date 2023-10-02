@@ -15,7 +15,14 @@
   
   <style>
   
-  
+  .state {
+    fill: lightgrey;
+  }
+  .outline {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+  }
   
   
 
@@ -70,28 +77,54 @@
                   
   // 0. Let's explore a new way to use promises for data imports that might be a bit cleaner when importing lots of files
   
+  // First, create an anonymous function with the async keyword and assign it to a variable 
+  // This creates a function that returns a promise (meaning it is run `asynchronously`)
+  // Try leaving out the async -- you'll see the change in what line 81 prints
+  const testFunc = async function() {
   
+    return "Hello" ;
+    
+  }
+  console.log( testFunc() );
   
+  // We use async functions because they give access to *await* which can make code a lot easier to read
+  // See docs here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
   
+  // * Start by making an anonymous async function which will contain most or all of your code *
+  // * Make sure to run the function after you make it (see bottom of file) *
+  // *** If it seems like nothing is happening, make sure you are running it ***
+  // * Then use await instead of .then()  -- see line 98
   
   // 1. An async function to load data and build the map
-  
+  const requestData = async function() {
   
     // 2. Draw a map of US using topoJSON
     // 2a. Import data as synchronous call to topoJSON data file
     // Care of Mike Bostock:
     //   "../datasets/us-smaller.json"
-    
-    
+    const us = await d3.json("../datasets/us-smaller.json");
+    console.log(us);
   
     // 2b. Pick out topographic features and build d3 helpers
+    var states = topojson.feature(us, us.objects.states);     // List of state outlines to fill
+    var statesMesh = topojson.mesh(us, us.objects.states);    // 'Mesh' of all outlines put together for a stroke
+    var projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
+    var path = d3.geoPath().projection(projection);
+    console.log(states);
+    console.log(statesMesh);
     
-    
-    
-    
-    // 2c. Draw states and outlines
-    
-    
+    // 2c. Draw states and outlines (see CSS at the top)
+    let statePaths = map.selectAll("path.state").data(states.features)
+                     .join("path")
+                     .attr("class", "state")
+                     .attr("note", d => d.id)  // debugging
+                     .attr("d", path)
+                     .on('mouseover',  mouseEntersState )
+                     .on('mouseout',  mouseLeavesState );
+  
+    map.append("path").datum(statesMesh)
+       .attr("class","outline")
+       .attr("d", path);
        
    // 2d. Add a graticule (we did this after 2c, but it must go here)
    //      (Graticules are much more configurable, but we'll use the default for now)
@@ -173,7 +206,8 @@
     
     
   // END OF REQUESTDATA()
-  
+  }
+  requestData();
   
   
   
