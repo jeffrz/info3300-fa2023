@@ -1,0 +1,206 @@
+<html><head>
+<title>INFO 3300 - October 2</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  
+  <style>
+  
+  
+  
+  
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for October 2</h3>
+  <p>
+    If you have a moment, please complete <a href="https://forms.gle/6yEozKHGbnvMbbEM6">this survey</a> to generate a dataset to use in class. Thanks.
+  </p>
+  <p>
+    We have a new import at the top of the file: <a href="https://github.com/topojson/topojson">TopoJSON</a><br/>
+    TopoJSON provides a helpful framework for storing, loading, and displaying topographical data. Check out its <a href="https://github.com/topojson/topojson-specification">data specification</a>.
+  </p>
+  <p>
+    More on <a href="https://github.com/d3/d3-geo">d3.geo</a> and its <a href="https://github.com/d3/d3-geo#azimuthal-projections">geographic projections</a>.
+  </p>
+
+  <h5>HTML for today:</h5>
+
+
+  <svg id="choropleth" height="600" width="900" style="background: #445; margin-top:50px" >
+
+  </svg>
+
+  <svg id="colorLegend" height="100" width="600" style="background: #fff; margin-top:30px" >
+
+  </svg>
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <!--- Code for today's class --->
+  <script id="notes1">
+
+  const svg = d3.select("#choropleth");
+  const width = svg.attr("width");
+  const height = svg.attr("height");
+  const margin = { top: 20, right: 20, bottom: 20, left:20};
+  const mapWidth = width - margin.left - margin.right;
+  const mapHeight = height - margin.top - margin.bottom;
+  const map = svg.append("g")
+                  .attr("transform","translate("+margin.left+","+margin.top+")");
+                  
+  // 0. Let's explore a new way to use promises for data imports that might be a bit cleaner when importing lots of files
+  
+  
+  
+  
+  
+  // 1. An async function to load data and build the map
+  
+  
+    // 2. Draw a map of US using topoJSON
+    // 2a. Import data as synchronous call to topoJSON data file
+    // Care of Mike Bostock:
+    //   "../datasets/us-smaller.json"
+    
+    
+  
+    // 2b. Pick out topographic features and build d3 helpers
+    
+    
+    
+    
+    // 2c. Draw states and outlines
+    
+    
+       
+   // 2d. Add a graticule (we did this after 2c, but it must go here)
+   //      (Graticules are much more configurable, but we'll use the default for now)
+   
+   
+   
+   
+   
+  
+    // 3a. Import survey data as synchronous calls
+    // "../datasets/us-state-names.tsv"
+    // "../datasets/state-survey-responses-22.csv"
+    
+    
+    
+    // 3b. Generate the counts we will need
+    
+    
+  
+  
+    // 3c. Make a d3 color scale for frequency    
+    
+    
+  
+  
+    // 3d. Recolor the states to make a choropleth map
+    
+    
+    
+  
+    // 3e. Use the extra legend code to draw a legend
+    
+    
+  
+  
+  
+    // 4. Add a tooltip that "sticks" below the state
+  
+  
+    // // Stub code to draw the tooltip - we use an SVG element here
+    // // You can use an absolute-positioned HTML element, but the positioning requires some more work
+    // // Instead, we make something centered at (0,0) and then later use translate() to move it
+    // //  (this is why the x position for the rect is -tooltipWidth/2.0  -- so it's centered on 0 )
+    // let tooltip = map.append("g")
+    //                  .attr("class","tooltip")
+    //                  .attr("visibility","hidden");
+    // tooltip.append("rect")
+    //        .attr("fill", "black")
+    //        .attr("opacity", 0.9)
+    //        .attr("x", -tooltipWidth / 2.0)
+    //        .attr("y", 0)
+    //        .attr("width",tooltipWidth)
+    //        .attr("height",tooltipHeight)
+    // let txt = tooltip.append("text")
+    //                  .attr("fill", "white")
+    //                  .attr("text-anchor","middle")
+    //                  .attr("alignment-baseline","hanging")
+    //                  .attr("x", 0)
+    //                  .attr("y", 2);
+    // let txt2 = tooltip.append("text")
+    //                  .attr("fill", "white")
+    //                  .attr("text-anchor","middle")
+    //                  .attr("alignment-baseline","hanging")
+    //                  .attr("x", 0)
+    //                  .attr("y", 22);
+    
+    
+    
+  
+    function mouseEntersPlot() {
+    }
+  
+    function mouseLeavesPlot() {
+    }
+    
+    
+    
+    
+    
+    
+  // END OF REQUESTDATA()
+  
+  
+  
+  
+  </script>
+  
+  
+  
+  
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
