@@ -15,14 +15,22 @@
   
   <style>
   
-  .state {
-    fill: lightgrey;
-  }
-  .outline {
-    fill: none;
-    stroke: black;
-    stroke-width: 1px;
-  }
+    .state {
+      fill: lightgrey;
+    }
+    .outline {
+      fill: none;
+      stroke: black;
+      stroke-width: 1px;
+    }
+    .graticule {
+        fill: none;
+        stroke: grey;
+        stroke-width: 1px;
+    }
+    .tooltip {
+        pointer-events: none;
+    }
   
   
 
@@ -113,6 +121,17 @@
     console.log(states);
     console.log(statesMesh);
     
+    // We tried a few different projections, including:
+    //   .geoOrthographic()  .geoStereographic()   .geoMercator()
+    
+    
+    // 2d. Add a graticule (we did this after 2c, but it must go here)
+    //      (Graticules are much more configurable, but we'll use the default for now)
+    let graticule = d3.geoGraticule10();
+    console.log(graticule);
+    map.append("path").attr("class","graticule").attr("d", path(graticule));
+    
+    
     // 2c. Draw states and outlines (see CSS at the top)
     let statePaths = map.selectAll("path.state").data(states.features)
                      .join("path")
@@ -125,85 +144,178 @@
     map.append("path").datum(statesMesh)
        .attr("class","outline")
        .attr("d", path);
-       
-   // 2d. Add a graticule (we did this after 2c, but it must go here)
-   //      (Graticules are much more configurable, but we'll use the default for now)
-   
-   
-   
-   
-   
   
     // 3a. Import survey data as synchronous calls
-    // "../datasets/us-state-names.tsv"
-    // "../datasets/state-survey-responses-22.csv"
+    // "../datasets/state-survey-responses-fa22.csv"
+    
+    const surveyData = await d3.csv("../datasets/state-survey-responses-fa22.csv", d3.autoType);
+    console.log(surveyData);
     
     
-    
-    // 3b. Generate the counts we will need
-    
-    
-  
+    // 3b. Generate the data structures we will need
+    var stateDict = {}   // stateID ===> stateData
+    surveyData.forEach( d => {
+      stateDict[d.state_code] = d;
+    });
+    console.log(stateDict)
+    // Our dataset did not include the Virgin Islands (I thought in lecture it was Guam, it's not)
+    // As a hack, let's just give it a datapoint since it is not going to appear on the map anyways
+    stateDict[78] = { total: 20 };
   
     // 3c. Make a d3 color scale for frequency    
-    
-    
+    // Notice that stateIdCounts is a dictionary and not an array, which is usually what we send to d3.extent
+    // We're only interested in the values in that dictionary, so we can use a static helper function in Object to help
+    const minMax = d3.extent( surveyData, d => d.total );
+    console.log(minMax);
+  
+    // This scale wasn't great because it crunched most of the points to the bottom 3rd of the color scale
+    //  3 state outliers with high values mean it is very distorted
+    // const colorScale = d3.scaleSequential(d3.interpolateBuPu).domain(minMax);
+  
+    // Next, we try quantize, which splits the domain into bins
+    // In general, it splits it into as many bins as you provide items in the range
+  
+    // const colorScale = d3.scaleQuantize()   // ZZZZZZZZZZZ  zedzedzedzedzedzedzedzedzedzed
+    //                      .domain(minMax)
+    //                      .range(["#fff","#d1e8ed","#adc2da","#8879b3","#762b80"])
+  
+    // Finally, we use quantile, which looks at the points statistically
+    //  It will give weird results if you send minMax to the .domain(). Why?
+    //  ...because it needs to inspect *all of the values* in order to see the point *distribution*
+    //  we use Object.values() here to get all of the values out of the stateCounts dictionary
+  
+    const colorScale = d3.scaleQuantile()      // LLLLLLLLL  elelelelelelelelloelloeleolol
+                         .domain( d3.map(surveyData, d => d.total) )
+                         .range(["#fff","#d1e8ed","#adc2da","#8879b3","#762b80"]);
+  
+  
+     // //  If you want to use a log scale instead of a linear quantile (which might work better):
+     // //   Here is one way to do this (note the use of Symlog because our domain includes 0)
+     // //   We create a new function that feeds the data value into a Symlog scale programmed to return 0 to 1
+     // //   It then routes the [0,1] value to interpolateGnBu, which returns a color, doing what we want
+     // //   Just like with normal scales, you feed them a data value and get back a color/pixel
+     // const colorScale = d => d3.interpolateGnBu( d3.scaleSymlog().domain(minMax).range([0,1])(d) );
+     // colorScale.domain = () => minMax;  // Hack to get legend working again because it uses scale.domain()
+     // // Another way to do this would be:
+     // const colorScale = d3.scaleLog().domain(minMax).interpolate(d => d3.interpolateGnBu)
+     // // Getting a scaleQuantile to work would be a bit trickier
+     // // You'll want to think about how to adjust the domain of the scale (hint: d3.map to transform data)
+     // //   and then also how you're going to show the values legend in the bottom scale
   
   
     // 3d. Recolor the states to make a choropleth map
-    
-    
-    
+    map.selectAll(".state")
+       .style("fill", d => colorScale( stateDict[d.id].total ) );
   
     // 3e. Use the extra legend code to draw a legend
+    drawLegend("#colorLegend", colorScale);
+  
     
-    
-  
-  
-  
+    // BONUS:
     // 4. Add a tooltip that "sticks" below the state
-  
-  
-    // // Stub code to draw the tooltip - we use an SVG element here
-    // // You can use an absolute-positioned HTML element, but the positioning requires some more work
-    // // Instead, we make something centered at (0,0) and then later use translate() to move it
-    // //  (this is why the x position for the rect is -tooltipWidth/2.0  -- so it's centered on 0 )
-    // let tooltip = map.append("g")
-    //                  .attr("class","tooltip")
-    //                  .attr("visibility","hidden");
-    // tooltip.append("rect")
-    //        .attr("fill", "black")
-    //        .attr("opacity", 0.9)
-    //        .attr("x", -tooltipWidth / 2.0)
-    //        .attr("y", 0)
-    //        .attr("width",tooltipWidth)
-    //        .attr("height",tooltipHeight)
-    // let txt = tooltip.append("text")
-    //                  .attr("fill", "white")
-    //                  .attr("text-anchor","middle")
-    //                  .attr("alignment-baseline","hanging")
-    //                  .attr("x", 0)
-    //                  .attr("y", 2);
-    // let txt2 = tooltip.append("text")
-    //                  .attr("fill", "white")
-    //                  .attr("text-anchor","middle")
-    //                  .attr("alignment-baseline","hanging")
-    //                  .attr("x", 0)
-    //                  .attr("y", 22);
+    let tooltipWidth = 120;
+    let tooltipHeight = 40;
     
     
-    
+    // At the end of file, I mentioned adding this code to do the mouseover outline the "proper" way
+    let momesh =  map.append("path")
+                     .attr("class","mouseover outline")
+                     .style("stroke", "black")
+                     .style("stroke-width", 3)
+                     .attr("d", "");
   
-    function mouseEntersPlot() {
+    // Stub code to draw the tooltip - we use an SVG element here
+    // You can use an absolute-positioned HTML element, but the positioning requires some more work
+    // Instead, we make something centered at (0,0) and then later use translate() to move it
+    //  (this is why the x position for the rect is -tooltipWidth/2.0  -- so it's centered on 0 )
+    let tooltip = map.append("g")
+                     .attr("class","tooltip")
+                     .attr("visibility","hidden");
+    tooltip.append("rect")
+           .attr("fill", "black")
+           .attr("opacity", 0.9)
+           .attr("x", -tooltipWidth / 2.0)
+           .attr("y", 0)
+           .attr("width",tooltipWidth)
+           .attr("height",tooltipHeight)
+    let txt = tooltip.append("text")
+                     .attr("fill", "white")
+                     .attr("text-anchor","middle")
+                     .attr("alignment-baseline","hanging")
+                     .attr("x", 0)
+                     .attr("y", 2);
+    let txt2 = tooltip.append("text")
+                     .attr("fill", "white")
+                     .attr("text-anchor","middle")
+                     .attr("alignment-baseline","hanging")
+                     .attr("x", 0)
+                     .attr("y", 22);
+    
+    
+    function mouseEntersState() {
+      // Make tooltip visible
+      tooltip.style("visibility","visible")
+  
+      // Find the state SVG element and add stroke
+      let state = d3.select(this);
+      
+      // // Original version before adding the bonus mesh
+      // state.attr("stroke","black")
+      //      .attr("stroke-width", 3);
+      
+      // Using .datum() to recover the data for the state element (because we used a .join() to make it)...
+      // ... get the name of the state and count
+      let stateID = state.datum().id;
+      let stateDat = stateDict[stateID]
+      
+      txt.text(stateDat.state_name);
+      txt2.text(stateDat.total);
+      
+      // You can use the geoPath() generator to do all sorts of helpful things 
+      // let [xPos, yPos] = path.centroid( state.datum() );  // Get the pixel "center" of the state
+      
+      let bounds = path.bounds( state.datum() );   // Get the pixel boundaries of the state
+      // In both cases here, the geoPath() is parsing the fancy topoJSON data to figure out pixels using the projection
+      
+      // Place it at the bottom of the state, centered
+      let xPos = (bounds[0][0]+bounds[1][0])/2.0;
+      let yPos = bounds[1][1] - 15;
+      
+      // Transform the <g> group so that everything moves together easily
+      tooltip.attr("transform",`translate(${xPos},${yPos})`);
+      
+      // To fix the oscillation, we add this in the CSS for .mouseover
+      //  pointer-events: none;
+      
+      // ** Adding this code can do the mouseover outline the "proper" way
+      // Technically, the right way to do this is with another mesh for some complicated reasons
+      //  You have to use the second parameter of topojson.mesh() to pick out this state's boundaries
+      // First, make a new mesh with a filter for only borders of the current state
+      var mo = topojson.mesh(us, us.objects.states, function(a, b) { return a.id === stateID || b.id === stateID; });
+      //  Then apply it to your special mesh that's on top of everything else (added earlier in this file)
+      momesh.datum(mo).attr("d", path)
+      
+      
+      
+  
     }
   
-    function mouseLeavesPlot() {
+    function mouseLeavesState() {
+  
+     // Hide when you leave a state
+     tooltip.style("visibility","hidden");
+  
+     let state = d3.select(this);
+     
+     // Reset old style mouseover stroke
+     // state.attr("stroke","none")
+     //      .attr("stroke-width", 0);
+     // }
+  
+     // Here we are hiding the mouseover mesh we added as bonus content
+     momesh.attr("d", "");
+  
     }
-    
-    
-    
-    
-    
     
   // END OF REQUESTDATA()
   }
@@ -213,6 +325,160 @@
   
   </script>
   
+  
+  
+  <script>
+    
+  
+  // Flexible legend-drawing function - Jeff Rzeszotarski, 2022
+  //   Released under MIT Free license
+  //  Takes in an SVG element selector <legendSelector> and a d3 color scale <legendColorScale>
+  //
+  // Usage example: drawLegend("#legendID", grossIncomeColorScale)
+  function drawLegend(legendSelector, legendColorScale) {
+    
+    // This code should adapt to a variety of different kinds of color scales
+    //  Credit Prof. Rz if you are basing a legend on this structure, and note PERFORMANCE CONSIDERATIONS
+    
+    // Shrink legend bar by 5 px inwards from sides of SVG
+    const offsets = { width: 10,
+                      top: 2,
+                      bottom: 24 }; 
+    // Number of integer 'pixel steps' to draw when showing continuous scales
+    //    Warning, not using a canvas element so lots of rect tags will be created for low stepSize, causing issues with performance -- keep this large
+    const stepSize = 4; 
+    // Extend the minmax by 0% in either direction to expose more features by default
+    const minMaxExtendPercent = 0;
+     
+    
+    const legend = d3.select(legendSelector);
+    const legendHeight = legend.attr("height");
+    const legendBarWidth = legend.attr("width") - (offsets.width * 2);
+    const legendMinMax = d3.extent(legendColorScale.domain()); 
+                // recover the min and max values from most kinds of numeric scales
+    const minMaxExtension = (legendMinMax[1] - legendMinMax[0]) * minMaxExtendPercent;
+    const barHeight = legendHeight - offsets.top - offsets.bottom;     
+    
+    // In this case the "data" are pixels, and we get numbers to use in colorScale
+    // Use this to make axis labels
+    let barScale = d3.scaleLinear().domain([legendMinMax[0]-minMaxExtension,
+                                              legendMinMax[1]+minMaxExtension])
+                                   .range([0,legendBarWidth]);
+    let barAxis = d3.axisBottom(barScale);
+    
+    // Place for bar slices to live
+    let bar = legend.append("g")
+                    .attr("class", "legend colorbar")
+                    .attr("transform", `translate(${offsets.width},${offsets.top})`)
+    
+    // ****** SWITCHES FOR DIFFERENT SCALE TYPES ******
+    
+    // Check if we're using a binning scale - if so, we make blocks of color
+    if (legendColorScale.hasOwnProperty('thresholds') || legendColorScale.hasOwnProperty('quantiles')) {
+      // Get the thresholds
+      let thresholds = [];
+      if (legendColorScale.hasOwnProperty('thresholds')) { thresholds = legendColorScale.thresholds() }
+      else { thresholds = legendColorScale.quantiles() }
+      
+      const barThresholds = [legendMinMax[0], ...thresholds, legendMinMax[1]];
+      
+      // Use the quantile breakpoints plus the min and max of the scale as tick values
+      barAxis.tickValues(barThresholds);
+      
+      // Draw rectangles between the threshold segments
+      for (let i=0; i<barThresholds.length-1; i++) {
+        let dataStart = barThresholds[i];
+        let dataEnd = barThresholds[i+1];
+        let pixelStart = barAxis.scale()(dataStart);
+        let pixelEnd = barAxis.scale()(dataEnd);
+        
+        bar.append("rect")
+           .attr("x", pixelStart)
+           .attr("y", 0)
+           .attr("width", pixelEnd - pixelStart )
+           .attr("height", barHeight)
+           .style("fill", legendColorScale( (dataStart + dataEnd) / 2.0 ) ); 
+      }
+    }
+    // Else if we have a continuous / roundable scale
+    //  In an ideal world you might construct a custom gradient mapped to the scale
+    //  For this one, we use a hack of making stepped rects
+    else if (legendColorScale.hasOwnProperty('rangeRound')) {
+      // NOTE: The barAxis may round min and max values to make them pretty
+      // ** This also means there is a risk of the legend going beyond scale bounds
+      // We need to use the barAxis min and max just to be sure the bar is complete
+      //    Using barAxis.scale().invert() goes from *axis* pixels to data values easily
+      // ** We also need to create patches for the scale if the labels exceed bounds
+      //     (floating point comparisons risky for small data ranges,but not a big deal
+      //      because patches will be indistinguishable from actual scale bottom)
+      // It's likely that scale clamping will actually do this for us elegantly
+      // ...but better to be safer and patch the regions anyways
+      
+      for (let i=0; i<legendBarWidth; i=i+stepSize) {
+        
+        let center = i+(stepSize/2);
+        let dataCenter = barAxis.scale().invert( center );
+        
+        // below normal scale bounds
+        if ( dataCenter < legendMinMax[0] ) { 
+          bar.append("rect")
+             .attr("x", i)
+             .attr("y", 0)
+             .attr("width", stepSize)
+             .attr("height",barHeight)
+             .style("fill", legendColorScale( legendMinMax[0] ) ); 
+         }
+         // within normal scale bounds
+         else if ( dataCenter < legendMinMax[1] ) {
+           bar.append("rect")
+              .attr("x", i)
+              .attr("y", 0)
+              .attr("width", stepSize)
+              .attr("height",barHeight)
+              .style("fill", legendColorScale( dataCenter ) ); 
+         }
+         // above normal scale bounds
+         else {
+           bar.append("rect")
+              .attr("x", i)
+              .attr("y", 0)
+              .attr("width", stepSize)
+              .attr("height",barHeight)
+              .style("fill", legendColorScale( legendMinMax[1] ) ); 
+         }
+        
+      }
+    }
+    // Otherwise we have a nominal scale
+    else {
+      let nomVals = legendColorScale.domain().sort();
+      
+      // Use a scaleBand to make blocks of color and simple labels
+      let barScale = d3.scaleBand().domain(nomVals)
+                                   .range([0,legendBarWidth])
+                                   .padding(0.05);
+      barAxis.scale(barScale);
+      
+      // Draw rectangles for each nominal entry
+      nomVals.forEach( d => {
+        bar.append("rect")
+           .attr("x", barScale(d) )
+           .attr("y", 0)
+           .attr("width", barScale.bandwidth() )
+           .attr("height", barHeight)
+           .style("fill", legendColorScale( d ) );
+      });
+    }
+    // DONE w/SWITCH
+    
+    // Finally, draw legend labels
+    legend.append("g")
+          .attr("class", "legend axis")
+          .attr("transform",`translate(${offsets.width},${offsets.top+barHeight+5})`)
+          .call(barAxis);
+    
+  }
+  </script>
   
   
   
