@@ -1,0 +1,60 @@
+state_name,state_code,state_short,total
+Alabama,1,AL,17
+Alaska,2,AK,34
+Arizona,4,AZ,93
+Arkansas,5,AR,8
+California,6,CA,251
+Colorado,8,CO,81
+Connecticut,9,CT,157
+Delaware,10,DE,87
+District of Columbia,11,DC,182
+Florida,12,FL,234
+Georgia,13,GA,87
+Hawaii,15,HI,78
+Idaho,16,ID,28
+Illinois,17,IL,110
+Indiana,18,IN,50
+Iowa,19,IA,17
+Kansas,20,KS,15
+Kentucky,21,KY,27
+Louisiana,22,LA,32
+Maine,23,ME,98
+Maryland,24,MD,166
+Massachusetts,25,MA,235
+Michigan,26,MI,83
+Minnesota,27,MN,39
+Mississippi,28,MS,8
+Missouri,29,MO,33
+Montana,30,MT,29
+Nebraska,31,NE,18
+Nevada,32,NV,87
+New Hampshire,33,NH,85
+New Jersey,34,NJ,234
+New Mexico,35,NM,38
+New York,36,NY,369
+North Carolina,37,NC,102
+North Dakota,38,ND,5
+Ohio,39,OH,85
+Oklahoma,40,OK,10
+Oregon,41,OR,44
+Pennsylvania,42,PA,245
+Rhode Island,44,RI,118
+South Carolina,45,SC,73
+South Dakota,46,SD,15
+Tennessee,47,TN,49
+Texas,48,TX,96
+Utah,49,UT,71
+Vermont,50,VT,83
+Virginia,51,VA,143
+Washington,53,WA,129
+West Virginia,54,WV,46
+Wisconsin,55,WI,47
+Wyoming,56,WY,45
+America Samoa,60,AS,0
+Federated States of Micronesia,64,FM,0
+Guam,66,GU,7
+Marshall Islands,68,MH,0
+Northern Mariana Islands,69,MP,0
+Palau,70,PW,0
+Puerto Rico,72,PR,34
+U.S. Minor Outlying Islands,74,UM,0
