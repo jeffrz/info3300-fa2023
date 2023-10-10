@@ -1,0 +1,167 @@
+<html><head>
+<title>INFO 3300 - October 11</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  
+  <style>
+  
+  
+  .nation {
+    fill: #ddd;
+  }
+
+  .outline {
+    stroke: #fff;
+    stroke-width: 1px;
+    fill: none;
+  }
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for October 11</h3>
+  <p>
+    Today's data (both geoJSON and CSV) for the first SVG come from the <a href="https://datasf.org/opendata/">DataSF</a> municipal open data initiative. I used <a href="https://mapshaper.org/">mapShaper</a> to convert the geoJSON file into a topoJSON file (which is much smaller for reasons discussed during the first geo coding lecture).
+  </p>
+  <p>
+    The second SVG will make use of a <a href="https://www.kaggle.com/datafiniti/fast-food-restaurants/data">fast food dataset</a> from Kaggle.
+  </p>
+  <p>
+    For contour mapping (whether using geography or not), it's better to keep the <a href="https://github.com/topojson/topojson">TopoJSON</a> import around. More on <a href="https://github.com/d3/d3-contour">d3.contour</a>. Here is a <a href="https://observablehq.com/@d3/volcano-contours">contour example</a> and a <a href="https://observablehq.com/@d3/density-contours">density example</a>.
+  </p>
+
+  <h5>HTML for today:</h5>
+
+  <svg id="sfmap" height="900" width="900" style="background: #fff; margin-top:50px" >
+
+  </svg>
+  
+  <p>Contour map:</p>
+  <svg id="fastfood" height="610" width="975" style="background: #fff; margin-top:50px" >
+
+  </svg>
+  
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <!--- Code for today's class --->
+  <script id="notes1">
+
+  const svg = d3.select("#sfmap");
+  const width = svg.attr("width");
+  const height = svg.attr("height");
+  const margin = { top: 20, right: 20, bottom: 20, left:20};
+  const mapWidth = width - margin.left - margin.right;
+  const mapHeight = height - margin.top - margin.bottom;
+  const map = svg.append("g")
+                  .attr("transform","translate("+margin.left+","+margin.top+")");
+
+  // Let's make a map of all of the municipal trees in San Francisco
+  // With any luck, we ought to be able to visualize the streets/blocks in the city, since trees line them
+  //   (this is really just an excuse to make a lot of dots)
+  
+  // Datasets for today:
+  //  "../datasets/SF-Neighborhoods.json"
+  //  "../datasets/Street_Tree_List_smaller.csv"
+
+
+  // 1. Make the dot map visualization
+  //  (refer to previous notes for more comments on async functions)
+  
+  
+  
+  
+  </script>
+  
+  <script id="notes1">
+  // Fast food map
+  const ffsvg = d3.select("#fastfood");
+  const ffwidth = ffsvg.attr("width");
+  const ffheight = ffsvg.attr("height");
+  const ffmapWidth = ffwidth;
+  const ffmapHeight = ffheight;
+  // No margins here since our US map already has a specific projection to match to size
+  const ffmap = ffsvg.append("g");
+
+  // 2. Make a contour map
+  
+  // const requestDataFF = async function() {
+  //   // For best results with this projection, we should use a 610x975px canvas and also
+  //   //   add the specific suggested settings
+  //   // Some map files come with specific recommendations for projection/dimensions!
+  //   const us = await d3.json("../datasets/counties-10m.json");
+  //   var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+  //               // NOTICE: You can customize the projection using .scale and .translate
+  //   var path = d3.geoPath().projection(projection);
+  //   var nation = topojson.feature(us, us.objects.nation);
+  //   var statesMesh = topojson.mesh(us, us.objects.states);
+  // 
+  //   // Draw nation and state outlines
+  //   ffmap.selectAll("path.nation").data(nation.features)
+  //        .join("path")
+  //        .attr("class", "nation")
+  //        .attr("d", path);
+  //    ffmap.append("path").datum(statesMesh)
+  //         .attr("class","outline")
+  //         .attr("d", path);
+  // 
+  //   // Now import our fastfood dataset
+  //   var fastfood = await d3.csv("../datasets/fastfood.csv", d3.autoType);
+  //   console.log(fastfood)
+  // 
+  // 
+  // 
+  //   // // We can show the circles to see whether our densities are plausible
+  //   // ffmap.selectAll("circle.dot").data(fastfood)
+  //   //      .join("circle")
+  //   //      .attr("class","dot")
+  //   //      .attr("r", 2)
+  //   //      .attr("fill", "darkgrey")
+  //   //      .attr("opacity", 0.2)
+  //   //      .attr("cx", d => d.position[0])
+  //   //      .attr("cy", d => d.position[1]);
+  // 
+  // 
+  // }
+  // requestDataFF();
+  
+  </script>
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
