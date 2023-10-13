@@ -1,0 +1,231 @@
+<html><head>
+<title>INFO 3300 - October 16</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  
+  <style>
+    
+    .county {
+      fill: slateblue;
+      stroke: none;
+    }
+
+    .state {
+      fill: lightgrey;
+      stroke: none;
+    }
+
+    .county-outline {
+      stroke: darkblue;
+      stroke-width: 1px;
+      fill: none;
+    }
+
+    .state-outline {
+      stroke: darkgrey;
+      stroke-width: 2px;
+      fill: none;
+    }
+
+    .graticule {
+      fill: none;
+      stroke: lightgrey;
+    }
+
+
+    .gridlines line {
+      stroke: #bbb;
+    }
+
+    .gridlines .domain {
+      stroke: none;
+    }
+  
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for October 16</h3>
+  <p>Today we'll enable panning and zooming gestures on both scatterplots and maps. Refer to the documentation for <a href="https://github.com/d3/d3-zoom">d3-zoom</a> for more information.</p> 
+  
+  
+  
+  <h5>HTML for today:</h5>
+
+  <svg id="plot" height="600" width="600" style="background: #fff; margin-top:50px" >
+  </svg>
+
+  <svg id="map" height="600" width="600" style="background: #fff; margin-top:50px" >
+  </svg>
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <!--- Code for today's class --->
+  <script id="notes1">
+  
+  const plot = d3.select("svg#plot");
+  const width = plot.attr("width");
+  const height = plot.attr("height");
+  const margin = { top: 10, right: 10, bottom: 50, left:50};
+  const chartWidth = width - margin.left - margin.right; 
+  const chartHeight = height - margin.top - margin.bottom;
+  const yAxisArea = plot.append("g").attr("transform",`translate(${margin.left-2},${margin.top})`);
+  const xAxisArea = plot.append("g").attr("transform",`translate(${margin.left},${chartHeight+2+margin.top})`);
+  const chartArea = plot.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+
+  const drawPlot = async () => {
+    
+    let data = await d3.csv("../datasets/gapminder.csv");
+    
+    data.forEach( (d, i) => {
+      d['life'] = Number(d['Life Expectancy']);
+      d['gdp'] = Number(d['GDP/Person (PPP$)']);
+      d['pop'] = Number(d['Total Population'].replace(/,/g,""));
+    });
+    
+    data = data.filter( (d) => {return d['gdp'] != 0 && d['life'] != 0 && d['pop'] != 0;}  );
+    console.log(data)
+
+    const xScale = d3.scaleSymlog().domain(d3.extent(data, d => d.gdp)).range([10, chartWidth-10]);
+    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d.life)).range([chartHeight-10, 10]);
+    const popScale = d3.scaleSymlog().domain(d3.extent(data, d => d.pop)).range([5,10]);
+    const regScale = d3.scaleOrdinal(d3.schemeCategory10);
+    
+    let yAxis = d3.axisLeft(yScale); 
+    yAxisArea.append("g").attr("class", "y axis").call(yAxis);
+    let xAxis = d3.axisBottom(xScale); 
+    xAxisArea.append("g").attr("class", "x axis").call(xAxis);
+
+    let yGridlines = d3.axisLeft(yScale).tickSize(-chartWidth).tickFormat("");
+    yAxisArea.append("g").attr("class", "y gridlines").call(yGridlines);
+    let xGridlines = d3.axisBottom(xScale).tickSize(-chartHeight).tickFormat("");
+    xAxisArea.append("g").attr("class", "x gridlines").call(xGridlines);
+
+
+    
+    // 1. PAN/ZOOM BEGINS HERE
+
+    chartArea.selectAll("circle.point").data(data)
+             .join("circle").attr("class","point")
+             .attr("cx", d => xScale(d['gdp']))
+             .attr("cy", d => yScale(d['life']))
+             .attr("r", d => popScale(d['pop']))
+             .attr("opacity", 0.8)
+             .style("fill", d => regScale(d.Region));
+    
+    
+    
+
+  }
+  drawPlot();
+
+
+  
+
+  const drawMap = async () => {
+    
+    const us = await d3.json("../datasets/us.json");
+    let filteredStates = ['2','02','15','60','66','69','72','74','78'];
+    us.objects.states.geometries = us.objects.states.geometries.filter( d => {
+                          return filteredStates.indexOf( d.id.toString().padStart(2,'0')  ) === -1;
+                        });
+    
+    const states = topojson.feature(us, us.objects.states);
+    const statesMesh = topojson.mesh(us, us.objects.states);
+    const counties = topojson.feature(us, us.objects.counties);
+    const countiesMesh = topojson.mesh(us, us.objects.counties);
+
+    let map = d3.select("#map");
+    let mapWidth = map.attr("width");
+    let mapHeight = map.attr("height");
+    let projection = d3.geoAlbers().fitSize([mapWidth, mapHeight], states);
+    let path = d3.geoPath().projection(projection);
+    let viewport = map.append("g");
+
+    // Add paths for everything
+    // GRATICULE
+    viewport.append("path")
+        .attr("class","graticule")
+        .attr("d",path(d3.geoGraticule10()));
+    // STATE POLYGONS
+    viewport.selectAll(".state").data(states.features)
+        .enter()
+        .append("path")
+        .attr("class","state")
+        .attr("d", path);
+    // COUNTY POLYGONS
+    viewport.selectAll(".county").data(counties.features)
+        .enter()
+        .append("path")
+        .attr("class","county")
+        .attr("d", path);
+    // COUNTY MESH
+    viewport.append("path")
+      .datum(countiesMesh)
+      .attr("class","county-outline")
+      .attr("d", path);
+    // STATE MESH
+    viewport.append("path")
+      .datum(statesMesh)
+      .attr("class","state-outline")
+      .attr("d", path);
+
+
+
+    // 2. PAN AND ZOOM STARTS HERE
+    
+    
+    
+
+
+  }
+  drawMap();
+
+
+
+
+
+  
+  
+  </script>
+  
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
