@@ -21,7 +21,7 @@
   }
 
   .outline {
-    stroke: #fff;
+    stroke: black;
     stroke-width: 1px;
     fill: none;
   }
@@ -65,6 +65,8 @@
   <!--- Code for today's class --->
   <script id="notes1">
 
+
+  // create plot frame
   const svg = d3.select("#sfmap");
   const width = svg.attr("width");
   const height = svg.attr("height");
@@ -86,8 +88,50 @@
   // 1. Make the dot map visualization
   //  (refer to previous notes for more comments on async functions)
   
-  
-  
+  const get_data = async function(){
+    // sanfran_neibor is being sent after d3.json is completely loaded
+      const sanfran_neibor = await d3.json("../datasets/SF-Neighborhoods.json");
+
+      // console.log(sanfran_neibor.objects);
+      
+      // change to GeoJson
+      var neighborhood = topojson.feature(sanfran_neibor,sanfran_neibor.objects.SFNeighborhoods)
+      console.log(sanfran_neibor.objects.SFNeighborhoods)
+      console.log(neighborhood); //change to geoJson
+
+      // create projection function that scale coordinate from latitude and lontitude into pixels
+      var projection = d3.geoMercator().fitSize([mapWidth,mapHeight],neighborhood);
+      // geoPath will transform TopoJson data into svg path, and projection function is an interface to accomodate the specified projection function
+      var path = d3.geoPath().projection(projection)
+
+
+      map.selectAll('path.neiborhood') //map is svg element which select/selectAll can call the element under
+         .data(neighborhood.features)
+         .join('path')
+         .attr('class','neiborhood') //because selectAll call .neiborhood class which is not existed now(js allows), should add the class so that js know where these lines should be located
+         .attr('d',path) //d is path svg element 
+
+    // imort tree data
+    const trees = await d3.csv("../datasets/Street_Tree_List_smaller.csv")
+
+
+    trees.forEach(d => {
+      d.positions = projection([d.Longitude,d.Latitude]) //write projection data into dictionary
+      
+    });
+
+    map.selectAll('circle.tree')
+       .data(trees)
+       .join('circle')
+       .attr('class','tree')
+       .attr('fill','green')
+       .attr('cx',d=>d.positions[0])
+       .attr('cy',d=>d.positions[1])
+       .attr('opacity',0.6)
+       .attr('r',1)
+
+  }
+  get_data()
   
   </script>
   
@@ -103,45 +147,83 @@
 
   // 2. Make a contour map
   
-  // const requestDataFF = async function() {
-  //   // For best results with this projection, we should use a 610x975px canvas and also
-  //   //   add the specific suggested settings
-  //   // Some map files come with specific recommendations for projection/dimensions!
-  //   const us = await d3.json("../datasets/counties-10m.json");
-  //   var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
-  //               // NOTICE: You can customize the projection using .scale and .translate
-  //   var path = d3.geoPath().projection(projection);
-  //   var nation = topojson.feature(us, us.objects.nation);
-  //   var statesMesh = topojson.mesh(us, us.objects.states);
-  // 
-  //   // Draw nation and state outlines
-  //   ffmap.selectAll("path.nation").data(nation.features)
-  //        .join("path")
-  //        .attr("class", "nation")
-  //        .attr("d", path);
-  //    ffmap.append("path").datum(statesMesh)
-  //         .attr("class","outline")
-  //         .attr("d", path);
-  // 
-  //   // Now import our fastfood dataset
-  //   var fastfood = await d3.csv("../datasets/fastfood.csv", d3.autoType);
-  //   console.log(fastfood)
-  // 
-  // 
-  // 
-  //   // // We can show the circles to see whether our densities are plausible
-  //   // ffmap.selectAll("circle.dot").data(fastfood)
-  //   //      .join("circle")
-  //   //      .attr("class","dot")
-  //   //      .attr("r", 2)
-  //   //      .attr("fill", "darkgrey")
-  //   //      .attr("opacity", 0.2)
-  //   //      .attr("cx", d => d.position[0])
-  //   //      .attr("cy", d => d.position[1]);
-  // 
-  // 
-  // }
-  // requestDataFF();
+  const requestDataFF = async function() {
+    // For best results with this projection, we should use a 610x975px canvas and also
+    //   add the specific suggested settings
+    // Some map files come with specific recommendations for projection/dimensions!
+    const us = await d3.json("../datasets/counties-10m.json");
+    var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+                // NOTICE: You can customize the projection using .scale and .translate
+    var path = d3.geoPath().projection(projection);
+
+
+    var nation = topojson.feature(us, us.objects.nation);
+
+    // console.log(nation) //geoJson
+    // console.log(us.objects.states) //topojson
+    console.log(nation) //topojson
+
+    var statesMesh = topojson.mesh(us, us.objects.states);
+    var statesMesh_feature = topojson.feature(us, us.objects.states);
+    // var countiesMesh = topojson.feature(us, us.objects.counties);
+    console.log(statesMesh)
+    console.log(statesMesh_feature)
+
+    // Draw nation and state outlines
+    ffmap.selectAll("path.nation").data(nation.features)
+         .join("path")
+         .attr("class", "nation")
+         .attr("d", path);
+     ffmap.append("path").datum(statesMesh_feature)
+          .attr("class","outline")
+          .attr("d", path);
+  
+    //  ffmap.append("path").datum(countiesMesh)
+    //       .attr("class","outline")
+    //       .attr("d", path);
+    
+    // Now import our fastfood dataset
+    var fastfood = await d3.csv("../datasets/fastfood.csv", d3.autoType);
+    console.log(fastfood)
+    
+    fastfood.forEach(d=>{
+      d.position = projection([d.longitude,d.latitude])
+    });
+
+    let contourGen = d3.contourDensity()
+                    .x( d=> d.position[0])
+                    .y( d=> d.position[1])
+                    .size( [ffwidth,ffheight] )
+                    .thresholds( 10 );
+
+    let countours = contourGen(fastfood);
+
+    console.log(countours)
+
+    let value_ext = d3.extent(countours, d=>d.value);
+    let colorScale = d3.scaleSequential(d3.interpolateViridis)
+                       .domain(value_ext);
+    let layer = ffmap.append('g');
+
+    layer.selectAll('path.countours')
+         .data(countours)
+         .join('path')
+         .attr('class','countours')
+         .attr("fill", d => colorScale(d.value) )
+         .attr("d", d3.geoPath())
+         .attr('opacity',0.5)          
+    // We can show the circles to see whether our densities are plausible
+    ffmap.selectAll("circle.dot").data(fastfood)
+         .join("circle")
+         .attr("class","dot")
+         .attr("r", 2)
+         .attr("fill", "darkgrey")
+         .attr("opacity", 0.2)
+         .attr("cx", d => d.position[0])
+         .attr("cy", d => d.position[1]);
+  
+  }
+  requestDataFF();
   
   </script>
   
