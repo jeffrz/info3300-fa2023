@@ -51,16 +51,95 @@
   
   // We will start with multitouch drawing on a canvas
   //  See https://observablehq.com/@fil/pointer-events-svg for a very clever way to use GeoJSON to do this in SVG
-  var canvas = d3.select('#plot')
-  var context = canvas.node().getContext('2d');
+  
+  // We haven't seen much of canvas elements yet. We will cover these in a later lecture
+  // For now, just think of them as a simple drawing canvas where you paint pixels
+  //  rather than making <circle> and <line> elements -- for our purposes
+  //  painting pixels onto a screen will work better (see above for a SVG solution)
+  var canvas = d3.select('#plot') // Get canvas element
+  var context = canvas.node().getContext('2d'); // Get the drawing context (the "paintbrush")
   let width = canvas.attr("width");
   let height = canvas.attr("height");
+  context.fillStyle = '#ddd'; // Pick a fill color
+  context.fillRect(0, 0, width, height); // Use that color to paint in a rectangle with these dimensions
   context.fillStyle = '#ddd';
-  context.fillRect(0, 0, width, height);
-  context.fillStyle = '#ddd';
-  context.lineWidth = 2;
-  context.lineCap = "round";
-
+  
+    // Handle touch events for as many fingers as will fit on screen
+    // For these, we use pointer events. You also have access to touch events, which work slightly differently
+    // In general, the pointer event API is the better one to use for multitouch behavior
+    
+    // Start with a "touchmove" to prevent default scrolling and zooming events on phones
+    //  With this, the canvas will "lock out" other kinds of gestures when interacting
+    canvas.on("touchmove", function(event) {event.preventDefault(); }) // prevent scrolling if two fingers are down
+        // Next, do this just to note behavior
+        .on("pointerup", function(event) { console.log("pointerup",event) } )
+        // Finally, detect when a finger is placed down
+        // Here we will set up some specific gesture handlers to deal with the finger that was just placed
+        .on("pointerdown", function(event) {
+          console.log("pointerdown", event);
+          
+          // Every time a new pointer is put down, we need to set the canvas up to track that individual finger -- while you can make some fancy logic to do this all in one event, it's much easier to set up per-finger listeners when the finger is placed on the canvas.
+          
+          let id = event.pointerId;  // Get the finger's ID assigned by the device/browser 
+          let targetNode = event.target;  // Another way to get "this" with pointers
+          
+          let prevPoint = null; // We are going to draw by marking the previous place the person moved...
+          let point = d3.pointer(event, targetNode); // ...and painting a line from there to the new location
+          //  d3.pointer will handle all of the math to figure out the right [x,y] position within targetNode
+          
+          //let color = d3.hsl(360 * Math.random(), 0.8, 0.7).hex() // each finger will get assigned a random color
+          
+          // BONUS: Here's a fun way to pick a random color from a d3 nominal color scheme
+          //   (in this case, we're using schemePaired but schemeCategory10 also works)
+          let color = d3.schemePaired[Math.floor(d3.schemePaired.length * Math.random())];
+          
+          // First step to set up the finger's gesture handlers:
+          // Designate the canvas to consume all touch events from here on for this finger (even if they move beyond the canvas bounds)
+          targetNode.setPointerCapture(id);
+          
+          // Second step: Make specfic events for this finger/touch
+          //  a) Handle when the finger lifts up or "disappears" and the device can't find it again
+          //     We do this by customizing the pointerup and pointercancel events with the finger ID
+          //     So pointerup becomes pointerup.5 if we want to respond ONLY to finger #5
+          //     You can bind multiple events to the same function using a space
+          canvas.on(`pointerup.${id} pointercancel.${id}`, function(evt) {
+            
+                  if (evt.pointerId !== id) return;  // check in case we didn't get the correct pointer event
+                  
+                  // clear out the events we added for this pointer
+                  d3.select(targetNode).on(`.${id}`, null); // "any event for fingers with this ID"
+                  
+                  // release the canvas pointer capture so that the finger ID can do other things again
+                  targetNode.releasePointerCapture(id);
+                
+                })
+          // b) Handle when the finger moves on a canvas, signalling we want to paint some color
+                .on(`pointermove.${id}`, function(evt) {
+                  
+                  if (evt.pointerId !== id) return;  // check in case we didn't get the correct pointer event
+                  
+                  prevPoint = point;  // move the last pointer location to prevPoint
+                  point = d3.pointer(evt, targetNode); // then get a new pointer location
+                  
+                  // assuming we had a previous point and it wasn't null...
+                  // then paint a line from prevPoint to point in that finger's color
+                  if (prevPoint) {
+                    context.beginPath();  // begin a paint stroke
+                    context.lineWidth = 2; // with width 3
+                    context.strokeStyle = color; // and the finger's color (stored with the function when made)
+                    context.moveTo(prevPoint[0], prevPoint[1]); // move the paintbrush to prevPoint
+                    context.lineTo(point[0], point[1]);  // then make a line of paint to point
+                    context.lineCap = "round"; // cap off lines with rounded corners
+                    context.stroke(); // ...and finally paint the stroke using the details provided
+                  }
+                });
+          
+        });
+               
+          
+          
+          
+        
   
 
   </script>
