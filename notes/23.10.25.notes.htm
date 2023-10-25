@@ -1,0 +1,139 @@
+<html><head>
+<title>INFO 3300 - October 25</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <style>
+  
+  line.dashed {
+    stroke: #aaa;
+    stroke-width: 1px;
+    stroke-dasharray: 2;
+  }
+  text.axis {
+    text-anchor: end;
+    font-variant: all-small-caps;
+  }
+  
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+    
+    <h3>Notes for October 25</h3>
+    <p>Check out the documentation for <a href="https://github.com/d3/d3-force">d3.force</a>.</p>
+    <p>While we put nodes in a random order on Wednesday, d3 also has a default positioning for nodes when you initialize a forceSimulation. It staggers them using a <a href="https://observablehq.com/@mbostock/phyllotaxis">phyllotaxis arrangement</a>.</p>
+    <p>Here is the d3.drag <a href="https://github.com/d3/d3-drag">documentation page</a>.</p>
+  
+    <h5>HTML for today:</h5>
+
+    <svg id="graph" height="800" width="800" style="background: #fff; margin-top:50px" >
+    </svg>
+    <div>
+    <button id="play">Play</button>
+    <button id="stop">Stop</button>
+    <button id="tick">Tick</button>
+    </div>
+
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+  <pre>
+    <code id="display2" class="hljs javascript">
+    </code>
+  </pre>
+
+  
+
+    <script id="notes1">
+    // Layer for drawing
+    const layer = d3.select("#graph").append("g");
+    const width = d3.select("#graph").attr("width");
+    const height = d3.select("#graph").attr("height");
+
+
+    const requestData = async () => {
+
+      // Load dataset of Karate club study 
+      const karate = await d3.json("../datasets/soc-karate-dense.json");
+      
+      console.log(karate);
+
+
+
+      
+      
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      // // Handle the buttons provided in the HTML the same way as we did before
+      // d3.select("#play").on("click", () => {
+      //   // Start animating the simulation
+      //   sim.alpha(1).restart(); // clears the "alpha" value and starts fresh
+      // 
+      // });
+      // d3.select("#stop").on("click", () => {
+      //   // Pause the simulation animation
+      //   sim.stop(); // pauses sim
+      // 
+      // });
+      // d3.select("#tick").on("click", () => {
+      //   // Move the simulation one "tick"
+      //   sim.tick(); // moves one frame forward, but doesn't trigger tick event
+      //   render(); // manually update circles
+      // 
+      // });
+    }
+
+    requestData();
+    
+    </script>
+
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
