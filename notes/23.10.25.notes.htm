@@ -74,43 +74,186 @@
       
       console.log(karate);
 
+      // Get the nodes
+      var nodes = karate.nodes; // Nodes can be just plain objects
+                                // Loop through nodes to build edges
+      
+      // What about links? 
+      // See karate.edges... but d3 expects a *sparse edge list* while we have a *dense matrix*
+      
+      // This dataset has a *dense* edge matrix rather than a *sparse* edge list
+      // Dense matrices are 2d arrays -- each place in the matrix corresponds to an index in *nodes*
+      //  If there is a 1 there, then there is an edge -- e.g. if edge: matrix[source][target] = 1
+      //  Since the data are non-directed, the matrix is symmetrical across diagonal
+      // Sparse edge lists are 1d arrays containing only the edges that are present
+      //  They are more efficient structures for the kinds of things we need to do (but aren't always)
+      //  To make one, we need to find all of the "1" values in the dense matrix (remembering it's symmetrical)
+      var links = [];
+      
+      // Loop through one half of the matrix (because it's symmetrical)
+      let edgeMatrix = karate.edges;
+      for (let i=0; i<nodes.length; i++) {
+        for (let j=i; j<nodes.length; j++) {   // j=i lets us loop over the upper right triangle only
+          
+          // If an edge is present, use the index to look up that node's ID number
+          // Then make a sparse edge object and put it into our list of links
+          if (edgeMatrix[i][j] === 1) {
+            sourceID = nodes[i]['id'];
+            targetID = nodes[j]['id'];
+            link = { 'source': sourceID, 'target': targetID };
+            links.push(link);
+          }
+          
+        }
+      }
+      
+      console.log(" Nodes and links");
+      console.log(nodes);
+      console.log(links);
+
+      // Build a simulation for the graph
+      var sim = d3.forceSimulation()
+                  .nodes(nodes)
+                  .force("links", d3.forceLink()   // Keep nodes that are connected near each other
+                                          .links(links)           // give the force an array of source/target objects
+                                          .id( node => node['id'] ) )
+                                                 // if source and target don't provide array indices for nodes, .id will tell the force what to look for in the nodes when it is trying to connect things together. Provide a getter function for _node elements_
+                  .force("repulse", d3.forceManyBody().strength(-150) ) // electrostatic repulsion between all nodes to space them out
+                  .force("center", d3.forceCenter(width/2.0, height/2.0)) // centering force to make sure points don't fly away completely
+                  .on("tick", render);
+
+
+      // *********          
+      // Notice how after building the d3.forceLink, the source/target values in links have been 
+      //  *changed into pointers* to elements in nodes. This will allow us to draw the edges easily!
+      // *********
+
+      // Do any pre-computing of ticks to smooth the animation?
+      // You could do them here so the graph "starts out" in a nice fashion
+
+
+      // Update the chart for a new tick of the simulation
+      function render() {
+
+        // Edges
+        let lines = layer.selectAll("line.link").data(links)
+             .join(
+               enter => enter.append("line")
+                             .attr("class","link")
+                             .attr("stroke","#333") 
+             )
+             .attr("x1", d => d.source.x).attr("x2", d => d.target.x)   // Using the pointers d3.forceLink provides to access node x and y coords
+             .attr("y1", d => d.source.y).attr("y2", d => d.target.y);
+
+        // Nodes
+        let circles = layer.selectAll("circle.node").data(nodes)
+               .join(
+                  enter => enter.append("circle")
+                                .attr("class","node")
+                                .attr("stroke", "#333")
+                                .attr("r", 8)
+                                .attr("cx", 0)
+                                .attr("cy", 0)
+                                .attr("fill", d => {
+                                  if (d.id === 1) { return "#0C0"; }
+                                  else if (d.id === 34) { return "#C00"; }
+                                  else { return "steelblue" }
+                                })
+                                // NOTE: Drag events work slightly different in v6 / v7 -- always check docs
+                                //  and verify which version any reference examples are using
+                                .call( d3.drag().on("start",dragstart)
+                                                .on("drag",dragging)
+                                                .on("end",dragend) )
+                )
+               .attr("transform", d => `translate(${d.x},${d.y})`);
+
+
+         // We are using a transform to move circles around rather than cx and cy
+         //  This occasionally does have performance implications -- some browsers/GPUs can "cache" the circles drawn and then just paint the same circle over again if you use transform (technically: store the image in a frame buffer and then blit it somewhere), but might have to redraw the pixels if you change r, cx, cy, etc.
+         //  This isn't at all guaranteed, and is still pretty rare. That said, this can be a good practice to get into if you are scaling up
+         //    (Though if you really need to scale up, then SVG will quickly stop performing)
+
+
+
+      }
+
+      render();  // Call render once to make sure we draw circles even if simulation stops
+
+      
+      // Handle drag events and add a nice text label
+      var label = layer.append("text").attr("id","label");
+
+      function dragstart(event, d) {
+        // Begin dragging a circle, make sure the simulation reserves enough alpha to react
+        // We use event.active here to make sure we handle multitouch
+        // This is also a boolean that can help to differentiate when you are using both a pan and a drag
+        if (!event.active) {
+          // alphaTarget here is the "minimum" alpha allowed in the model
+          // If it is greater than 0, then points are always allowed to move a bit
+          // During the drag we want it to be >0 so that the model can shift around
+          // Too low and it feels mushy. Too high and it feels jumpy or falls apart
+          label.text(d.id);
+          sim.alphaTarget(0.08).restart();
+        }
+
+        // We initially tried d.x=event.x; The problem here was that the model is changing d.x in real time.
+        // In the best case, it just means the drag and model fight, leading to points that vibrate
+        // In the worst case, you run into a race condition or other concurrency issue
+
+        // Putting values into d.fy and d.fx signal to d3 that you are FIXING the point in a location -- usually used for drags
+        // This disallows the simulation from changing x and y of this point
+        d.fx = event.x;
+        d.fy = event.y;
+
+        label.attr("x",event.x + 5).attr("y",event.y);
+
+      }
+      function dragging(event, d) {
+        // Continue dragging
+        d.fx = event.x;
+        d.fy = event.y;
+        label.attr("x",event.x + 5).attr("y",event.y);
+
+      }
+      function dragend(event, d) {
+        // End dragging a circle, make sure the simulation has enough alpha left to fix things afterwards
+        if (!event.active) {
+          sim.alphaTarget(0); // Allow the simulation to cool completely again
+          label.text("");
+        }
+
+        // Remember to null out your .fx and .fy so that d3 can begin simulating the dragged point once more
+        d.fx = null;
+        d.fy = null;
+
+      }
+
+
+
+
+
+
+
 
 
       
+      // Handle the buttons provided in the HTML the same way as we did before
+      d3.select("#play").on("click", () => {
+        // Start animating the simulation
+        sim.alpha(1).restart(); // clears the "alpha" value and starts fresh
       
+      });
+      d3.select("#stop").on("click", () => {
+        // Pause the simulation animation
+        sim.stop(); // pauses sim
       
+      });
+      d3.select("#tick").on("click", () => {
+        // Move the simulation one "tick"
+        sim.tick(); // moves one frame forward, but doesn't trigger tick event
+        render(); // manually update circles
       
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-      // // Handle the buttons provided in the HTML the same way as we did before
-      // d3.select("#play").on("click", () => {
-      //   // Start animating the simulation
-      //   sim.alpha(1).restart(); // clears the "alpha" value and starts fresh
-      // 
-      // });
-      // d3.select("#stop").on("click", () => {
-      //   // Pause the simulation animation
-      //   sim.stop(); // pauses sim
-      // 
-      // });
-      // d3.select("#tick").on("click", () => {
-      //   // Move the simulation one "tick"
-      //   sim.tick(); // moves one frame forward, but doesn't trigger tick event
-      //   render(); // manually update circles
-      // 
-      // });
+      });
     }
 
     requestData();
