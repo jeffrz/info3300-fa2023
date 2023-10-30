@@ -1,0 +1,152 @@
+<html><head>
+<title>INFO 3300 - October 30 - November 6</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  
+  <style>
+
+  .outline {
+    stroke: gainsboro;
+    stroke-width: 1px;
+    fill: none;
+  }
+
+  circle {
+    fill: darkgrey;
+    stroke-width: 1px;
+  }
+
+  .area {
+    stroke: royalblue;
+    fill: skyblue;
+    stroke-width: 2px;
+  }
+
+  #panel {
+    width: 930px;
+  }
+
+  #map {
+    width: 600px;
+    height: 500px;
+    float: left;
+  }
+  #controls {
+    width:300px;
+    height:500px;
+    float:right;
+  }
+  #controls input {
+    width:200px;
+    margin-left:5px;
+  }
+  
+  .datapoint {
+      opacity: 0.5;
+      fill: black;
+  }
+  .starred {
+    fill: red;
+    opacity: 1;
+  }
+
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+  <h3>Notes for October 30 - November 6</h3>
+  
+  <h5> ATTN: THIS PAGE USES A SIMPLE PYTHON FLASK SERVER TO SERVE ITS DATA </h5>
+  
+  <p> Make sure to run the flask web server (e.g. "python3 serv.py") in order to play with this code. Using the old SimpleHTTPServer will not work here. If you get a "flask module not found" error, then you may need to install it using "pip install flask". </p> 
+  <p> You can find installation instructions on <a href="https://flask.palletsprojects.com/en/2.3.x/">Flask's documentation</a>. Here is a <a href="https://flask.palletsprojects.com/en/2.3.x/quickstart/">quick start guide</a> for creating a project. Flask is certainly not the only way to provide the kinds of client/server communications we are exploring in class. It's just a lightweight one that has a lot of nuts and bolts exposed. Real production environments are more likely to use a stack of back- and front-end tools such as <a href="https://reactjs.org/">React</a>, <a href="https://www.djangoproject.com/">Django</a>, and its <a href="https://www.django-rest-framework.org/">RESTful framework</a>.</p>
+  
+  <p> Check out the original paper on <a href="http://www.cs.umd.edu/hcil/trs/92-01/92-01.html">Dynamic HomeFinder</a>. A <a href="https://youtu.be/5X8XY9430fM">1993 video</a> shows its dynamic queries in action. </p>
+  
+  <p> If you want to play with Dynamic Homefinder, you can download a version for MSDOS <a href="http://hcil.umd.edu/products/">here</a>. Use DOS simulator like DOSBox or Boxer to run it. </p>
+  
+  <p> (Finally, note that this client/server setup intentionally disregards some best practices. It's not making the best use of back- and front-end capabilities, wastes bandwidth, and might break in high latency situations -- all of which you should do better in a real-world app.)</p>
+  
+  <p> Here is some <a href="https://github.com/d3/d3-brush">documentation</a> on d3-brush, which we use in a later lecture for our direct filter interactions. </p>
+  
+  <h5>HTML for today:</h5>
+
+  <div id="panel">
+    <div id="map">
+      <svg id="map_canvas" height="490" width="600" style="background: #fff;" ></svg>
+    </div>
+    <div id="controls">
+    </div>
+  </div>
+  
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <div>
+    <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+  </div>
+
+  <!--- Code for today's class --->
+  <script id="notes1">
+
+  const requestData = async () => {
+  
+    
+  // Data originally in GeoJSON form on the WPRDC (https://data.wprdc.org/dataset/neighborhoods1)
+  //  Converted to topoJSON, which reduced file size from 1.3mB to 250kB.
+  const pgh = await d3.json("/map");
+  
+  console.log(pgh);
+  
+  const houses = await d3.json("/houses");
+  
+  console.log(houses)
+  
+
+  };
+
+  requestData();
+
+
+
+
+  </script>
+
+
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+
+  </div>
+</body>
+</html>

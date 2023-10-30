@@ -1,0 +1,44 @@
+body {
+  font-family: 'Lato', 'Helvetica', sans-serif;
+  font-weight: 400;
+  margin: 20px;
+}
+h1, h2, h3, h4, h5 {
+  font-family: 'Raleway', 'Helvetica', sans-serif;
+  font-weight: 700;
+}
+h5 {
+  margin: 0;
+  padding-top: 50px;
+}
+.container {
+  max-width: 768px;
+}
+.larger {
+  max-width: 1024px;
+}
+.lecture:after {
+    content: " ¤";
+    margin-right: 6px;
+}
+.doc-section {
+  padding: 2rem 0;
+  border-top: 1px solid #eee;
+  margin-bottom: 0
+}
+.fixed-cell {
+  max-width: 150px;
+}
+.online .fixed-cell {
+  max-width: 120px;
+}
+.schedule tr td:first-child {
+  font-weight: bold;
+}
+.online .week-label td {
+  font-weight: bold;
+}
+.online .week-label td:first-child {
+  min-width: 80px;
+  padding-left:20px;
+}
