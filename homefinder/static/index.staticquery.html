@@ -122,55 +122,6 @@
   map.append("path").datum(pghMesh).attr("class","outline").attr("d", path);
   
   
-  
-  
-  
-  // Let's make some dynamic querying tools
-  // We want to give more rapid response to users and enable more direct manipulation of interface elements
-  // To do so, we'll use d3.brush to make our own sliders
-  // We'll go further, showing the data distribution to the user underneath the slider
-  // This is going to require that we keep the whole dataset in RAM -- querying the server every time the user interacts is going to be cumbersome and intractible once latency gets involved
-  // (whenever you design systems like this, you'll face this kind of trade-off)
-  
-  // NOTE: this code was originally towards the bottom of the file -- as updateHouses needs to run pointPassesFilters,
-  //   it must be moved up here so that it has a filters dict to iterate through
-  // NOTE 2: The reason my original filter function demo kept failing is because d.SalePrice is not a valid key
-  
-  // First, a list of filters the user has applied
-  // The dict is going to map attribName => filter_function
-  //  - We use a dict so that we can change filters as the user adjusts them
-  //  - The filter_function is a clever way to set up the filters in real time...
-  //    the interactive elements will create a function that is True when a point
-  //    'passes' the filters
-  var filters = {};
-  
-  // EXAMPLE FILTER FUNCTION
-  // filters['price'] = function(d) {  return d.price < 400000 && d.price > 300000;  }
-  
-  // And a function for checking whether a point "passes through" the filters
-  // For a given point, we'll loop through each of the filter functions and apply them
-  // Each time we apply a filter, we use && to make sure a point passes ALL of the filters
-  function pointPassesFilters( point ) {
-  
-    // Start out with true so we can use && to 
-    let stillPassed = true;
-    
-    // Loop through the filters and check if it passes each
-    // Objects.values(filters) in this case is the list of filter functions
-    
-    Object.values(filters).forEach( filterFunc => {
-      
-      stillPassed = filterFunc(point) && stillPassed;
-      // Might want to short-circuit the loop if it fails and you have lots of filters
-      
-    });
-    
-    return stillPassed;
-    
-  }
-  
-  
-  
   // Load in house data from our backend server -- apply no filter criteria so we get everything
   // It is good practice to keep a "var" of these datasets around so that if new data come in during interactions they will be in an obvious place and you don't need to download them again
   var houses = await d3.json("/houses");
@@ -179,9 +130,7 @@
   // This makes life easier and reduces redundant copies of code which lead to bugs
   function updateHouses(data) {
     
-    data = data.filter( d => pointPassesFilters(d) );
-    
-    // console.log("updateHouses",data);
+    console.log("updateHouses",data);
     
     // Project the lat, lng data to pixels
     data.forEach( d => {
@@ -228,7 +177,7 @@
   // Like updateHouses, we wrap this in a function in case we need to star things often
   function updateStarred(data) {
     
-    // console.log("updateStarred",data);
+    console.log("updateStarred",data);
   
     // Select all circles and assign the class "starred" if their HouseID is in the starred list
     map.selectAll("circle")
@@ -240,91 +189,145 @@
   updateStarred(starred);
   
   
-  // Let's add some dynamic query tools to let the user filter their data
-  
-  
-  // Make the interactive sliders
-  
-  // A function to make a slider element and wire it up
-  function makeSlider( container, label, attribute, sliderWidth, sliderHeight ) {
-    
-    // Get a raw array of values for this property
-    let values = houses.map(d => d[attribute]);
-    
-    // Find min and max for some scales
-    let minMax = d3.extent(values);
-    let xScale = d3.scaleLinear().domain( minMax )
-                                .range([10,sliderWidth-10]); // padding here for ease
-    let xAxis = d3.axisBottom(xScale).tickFormat(d3.format(".2s"));
-
-
-    // Create some HTML elements
-    let wrapper = container.append("div").attr("class", "control");
-    wrapper.append("div").text(label);
-    let canvas = wrapper.append("svg").attr("width",sliderWidth)
-                                      .attr("height",sliderHeight+20)
-                                      .attr("attribute",attribute);
-    canvas.append("g").attr("transform",`translate(0,${sliderHeight})`)
-                      .call(xAxis);
-  
-    // Create the filter_function for this particular slider
-    // BY DEFAULT, it just always returns true because any point passes through the filter
-    let filterFunc = d => true;
-    // Add it to the dict so we can overwrite it later
-    filters[attribute] = filterFunc;
-
-    
-    // Allow the user to select regions of the slider
-    var brush = d3.brushX().extent([[10,0],                           // Upper left corner
-                                    [sliderWidth-10, sliderHeight]])  // Lower right corner
-                           .on("brush end", brushMoved);
-    // NOTE: we still need to *call the brush* towards the end of our code to "paste" it into HTML
-    
-    function brushMoved( event ) {
-        
-      //console.log(d3.event.type, d3.event.selection);
-      
-      // Everything but clicking on brush area
-      if (event.selection !== null) {
-        
-        // Run scales in reverse to get data values for the ends of the brush
-        //  If a scale turns data -> pixels, then scale.invert turns pixels -> data
-        let start = xScale.invert( event.selection[0] );
-        let end = xScale.invert( event.selection[1] );
-        
-        // Overwrite old filter in our dictionary
-        // This filter now only returns True if the point's value is between start and end
-        let filterFunc = d => d[attribute] >= start && d[attribute] <= end;
-        filters[attribute] = filterFunc;
-        
-        updateHouses(houses);
-        updateStarred(starred);
-      }
-      // Clicking on brush area to empty it out
-      else {
-          // Selected nothing, let everything pass
-          let filterFunc = d => true;
-          filters[attribute] = filterFunc;
-          
-          updateHouses(houses);
-          updateStarred(starred);
-      }
-      
-    
-    }   
-             
-    // Call the brush to add it to the slider - do this at the end so that it covers the area chart
-    canvas.append("g").attr("class","brush").call(brush);
-    
-  }
-  
-  // Make the sliders
+  // Let's add some static query tools to let the user filter their data
+  // These will take the form of text input fields and a button to apply the filter
   let controls = d3.select("#controls");
   
-  makeSlider( controls, "Sale Price: ", "Sale Price", 280, 30 );
-  makeSlider( controls, "Bedrooms: ", "Bedrooms", 280, 30 );
-  makeSlider( controls, "Bathrooms: ", "Bathrooms", 280, 30 );
-  makeSlider( controls, "Lot Size: ", "Lot Size", 280, 30 );     // serv.py sends this too
+  // Sale price
+  let price = controls.append("div") // Container
+  price.append("p").text("Min Price:") // Label
+       .append("input")              // Input element
+       .attr("type","text")  
+       .attr("class","price")
+       .attr("param","priceMn");
+       // We use the "param" attribute to store where this value would go in the URL
+  price.append("p").text("Max Price:")
+       .append("input")        
+       .attr("type","text")  
+       .attr("class","price")
+       .attr("param","priceMx");
+       
+  // Bedrooms
+  let bed = controls.append("div")
+  bed.append("p").text("Min Beds:")
+      .append("input")        
+      .attr("type","text")  
+      .attr("class","bed")
+      .attr("param","bedMn");
+  bed.append("p").text("Max Beds:")
+      .append("input")        
+      .attr("type","text")
+      .attr("class","bed")
+      .attr("param","bedMx"); 
+      
+  // Bathrooms
+  let bath = controls.append("div")
+  bath.append("p").text("Min Baths:")
+      .append("input")        
+      .attr("type","text")
+      .attr("class","bath")
+      .attr("param","bathMn");
+  bath.append("p").text("Max Baths:")
+      .append("input")        
+      .attr("type","text")
+      .attr("class","bath")
+      .attr("param","bathMx");   
+  
+  // Placeholder for error message    
+  let error = controls.append("div")
+                      .attr("id","errormsg")
+  
+                      
+  // Button to submit
+  // You could imagine doing this all on the client's side (and it would be more efficient)
+  // Here we send the request to the server so that we can see what's happening
+  // In cases where the server has vastly more data than can be transmitted, this pattern is more useful
+  let button = controls.append("div")
+          .append("button")
+          .text("Update")
+          // ADD SOME CODE HERE!
+          .on("click", function() {
+            // look at what the user has entered
+            
+            let target = new URL("/houses", document.location);
+            
+            controls.selectAll("input").each( function() {
+              
+              let key = d3.select(this).attr("param");
+              let txt = d3.select(this).property("value");
+              
+              if (txt.length > 0) {
+                
+                //add that criterion to the search
+                target.searchParams.append(key, txt);
+                
+              }
+              
+            });
+            
+            console.log(target);
+            
+            // send the filter criteria to the server
+            d3.json( target ).then( (data) => {
+              
+              houses = data;
+              updateHouses(data);
+              updateStarred(data);
+              
+            });
+            
+            
+            
+          });
+  
+  
+  // BONUS: Add some input validation
+  //  The "change" event for text just triggers when you click off -- we want realtime feedback
+  controls.selectAll("input").on("input", validate);
+  function validate() {   // (this is an example of hoisting since validate didn't yet exist above)
+  
+    // First enable the button and empty the text msg
+    error.text("");
+    button.property("disabled","");
+  
+    // Go through each input
+    controls.selectAll("input").each( function() {
+  
+      let txt = d3.select(this).property("value");
+      if (txt.length < 1) {
+        return;
+      }
+  
+      // We'll use switch as shorthand for a series of it/else statements
+      // Switch always uses the === comparator
+      switch ( d3.select(this).attr("class") ) {
+        case "price":
+          if (!validator.isCurrency(txt)) {
+            error.text("Please include a valid currency value for price.")
+            button.property("disabled","true");
+          }
+          // NOTE: While we validate for currency, this still breaks the server
+          //       We would need to add code to serv.py to handle the $ and , keys that validator allows
+          break;
+        case "bed":
+          if (!validator.isInt(txt)) {
+            error.text("Please include a valid whole number for beds.")
+            button.property("disabled","true");
+          }
+          break;
+        case "bath":
+          if (!validator.isFloat(txt)) {
+            error.text("Please include a valid decimal number for baths.")
+            button.property("disabled","true");
+          }
+          break;
+      }
+  
+    })
+  
+  } 
+  
+  
   
 
   };
