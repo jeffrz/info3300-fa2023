@@ -145,7 +145,7 @@
   var filters = {};
   
   // EXAMPLE FILTER FUNCTION
-  // filters['price'] = function(d) {  return d.price < 400000 && d.price > 300000;  }
+  // filters['price'] = function(d) {  return d['Sale Price'] < 400000 && d['Sale Price'] > 300000;  }
   
   // And a function for checking whether a point "passes through" the filters
   // For a given point, we'll loop through each of the filter functions and apply them
@@ -179,6 +179,7 @@
   // This makes life easier and reduces redundant copies of code which lead to bugs
   function updateHouses(data) {
     
+    // Filter the points using the filter dictionary first
     data = data.filter( d => pointPassesFilters(d) );
     
     // console.log("updateHouses",data);
@@ -249,7 +250,7 @@
   function makeSlider( container, label, attribute, sliderWidth, sliderHeight ) {
     
     // Get a raw array of values for this property
-    let values = houses.map(d => d[attribute]);
+    let values = data.map(d => d[attribute]);
     
     // Find min and max for some scales
     let minMax = d3.extent(values);
@@ -266,6 +267,44 @@
                                       .attr("attribute",attribute);
     canvas.append("g").attr("transform",`translate(0,${sliderHeight})`)
                       .call(xAxis);
+                      
+                      
+    // Make an area chart
+    let areaLayer = canvas.append("g");
+    
+    // Built-in d3 helper function to count up data
+    let numBins = 10;
+    // Program a histogram generator to count up data into "bins"
+    let histoGen = d3.histogram().domain( minMax )
+                                 .thresholds( numBins );
+    let counts = histoGen(values);
+    console.log(counts);
+    // Notice that counts is an array of arrays, but each of the elements
+    //  actually has some bonus properties, x0 and x1 along with length
+    // These are actually what you use to draw the histogram
+                               
+    // To make the line chart smoother, we add a dummy Object at the start of the array using unshift
+    // Our fake datapoint just mimics the original first point to fill the space
+    // (If you used x0 to draw the area, then you'd have to add the dummy Object at the end)
+    counts.unshift({ x0: 0,
+                     x1: counts[0].x0,
+                     length: counts[0].length });
+
+    let yScale = d3.scaleLinear().domain( d3.extent(counts, d=>d.length) )
+                                 .range([sliderHeight, 4]); 
+
+    // Area generator is like a lineGen, but we give y0 and y1 to fill it in
+    let area = d3.area().x(d => xScale(d.x1))
+      .y0(yScale(0))
+      .y1(d => yScale(d.length))
+      .curve(d3.curveNatural);
+      
+    // Adding the path works just like a line (the area generator just makes a filled region)
+    areaLayer.append("path").datum(counts)
+      .attr("class", "area")
+      .attr("d", area);
+      
+    
   
     // Create the filter_function for this particular slider
     // BY DEFAULT, it just always returns true because any point passes through the filter
@@ -282,7 +321,7 @@
     
     function brushMoved( event ) {
         
-      //console.log(d3.event.type, d3.event.selection);
+      console.log(event.type, event.selection);
       
       // Everything but clicking on brush area
       if (event.selection !== null) {
