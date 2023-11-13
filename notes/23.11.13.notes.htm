@@ -129,22 +129,57 @@
     });
     
     
+    // ** Make a contour generator **
+    // You'll see two kinds in the documentation, d3.contour() and d3.contourDensity
+    // -Use d3.contour when you have *values* spread across space and want to show them
+    // -Use contourDensity when you have *points* spread over space and want to show
+    //   *how many* there are in a given location compared to other locations
+    // Like other shape generators, you're programming a function that takes in a
+    //  dataset and does something fancy to it to generate shapes
+    let contourGen = d3.contourDensity()
+                       .x( d => d.position[0] )        // point x position (best in pixels)
+                       .y( d => d.position[1] )        // point y position (best in pixels)
+                       .size( [ffwidth, ffheight] )    // size of canvas
+                       .thresholds( 10 );              // number of "levels" you want
     
+    // Now run the contour generator on your dataset
+    let contours = contourGen(fastfood);
     
+    // Check out what kind of data you get...
+    console.log(contours)
+    // It's actually a topoJSON featureCollection!
+    // A contour generator creates fake geographic data to use to draw contours
+    // We know how to work with these kinds of things...
     
+    // Let's make a color scale for the density contours
+    // Our topoJSON has an extra key for each feature, value, that is the density
+    //  value for that particular contour in the list -- we can use extent to figure
+    //  out the min and max density levels so we can apply a color scale
+    let valueExtent = d3.extent(contours, d => d.value);
+    let colorScale = d3.scaleSequential(d3.interpolateViridis).domain(valueExtent)
     
+    let layer = ffmap.append("g");
     
+    // Sidenote: The array of features that contourDensity gives you have been carefully
+    //  ordered so that the big, low density ones will be earlier in the list -- this
+    //  guarantees that they'll be drawn *underneath* the higher densities in a join
+    layer.selectAll("path.contours")
+         .data(contours)
+         .join("path")
+         .attr("class", 'contours')
+         .attr("fill", d => colorScale(d.value) )
+         .attr("d", d3.geoPath())  
+            // NOTE: We create a new d3.geoPath because we have already converted our 
+            //  locations into pixels. We don't need a projection in our geoPath now
+            
+    // But how do we make sure the user can still see the map details and state borders?
+    // layer.attr("opacity", 0.5)   // This doesn't work too well to show map details...
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    // Better is to layer some stuff on top of the contours!
+    ffmap.append("path").datum(statesMesh)
+         .attr("class","outline")
+         .attr("opacity", 0.5)
+         .attr("d", path);
     
     // // We can show the circles to see whether our densities are plausible
     // ffmap.selectAll("circle.dot").data(fastfood)
@@ -154,7 +189,7 @@
     //      .attr("fill", "darkgrey")
     //      .attr("opacity", 0.2)
     //      .attr("cx", d => d.position[0])
-    //      .attr("cy", d => d.position[1]);””
+    //      .attr("cy", d => d.position[1]);
     
     
   }
@@ -203,8 +238,76 @@
     // });
     
     
+    // Make a contour generator for density
+    let contourGen = d3.contourDensity()
+                       .x( d => xScale(d['coords_x']) )
+                       .y( d => yScale(d['coords_y']) )
+                       .size( [400, 340] )  // size of our viewport ((max-min for possible values of x,y))
+                       .thresholds( 15 );  // number of "levels" we want in our contour
     
     
+    // First, visualize all shots
+    let contours = contourGen(data);
+    console.log(contours); // Notice that this is a GeoJSON object
+    
+    // Again, contourDensity gives each level a .value property for it's density level
+    //  A log scale may be more appropriate for the levels, but that's a longer discussion
+    let valueExtent = d3.extent(contours, d => d.value);
+    let colorScale = d3.scaleSequential(d3.interpolateBuGn).domain(valueExtent);
+    
+    // Draw the contours just like any other geoJSON object
+    // No projection needed for geoPath because it's already working in the right pixel space
+    layer.selectAll("path.All").data(contours)
+         .join("path")
+         .attr("class", "All")
+         .attr("stroke", "black")
+         .attr("stroke-linejoin", "round")
+         .attr("fill", d => colorScale(d.value))
+         .attr("d", d3.geoPath() );
+    
+    
+    // *Make a legend for all of the shot types*
+    
+    // Let's get a list of all of the different event_detail in the dataset
+    // Here we use d3.map to get all of the different shot types
+    // Since we have one for every point, we need to find *unique* values
+    // We'll use a recent JS addition, the Set() which only permits unique vals
+    let types = new Set( d3.map(data, d => d['event_detail']) );
+    console.log(types);
+    // Behind the scenes Sets usually use a dictionary-like object
+    
+    // For each type of shot
+    types.forEach( shotType => {
+      
+      // Get a unique color for that type and make a dataset of only those shots
+      let color = ordScale(shotType);
+      console.log(shotType, color);
+      
+      // Filter to make a dataset containing only points with matching shotTypes
+      let filteredData = data.filter( d => d['event_detail'] === shotType );
+      
+      // Make density contours for the filtered data
+      let contours = contourGen(filteredData);
+      // Figure out the min/max density (will be different from the extent for all)
+      let filteredValueExtent = d3.extent(contours, d => d.value);
+      // Make a bespoke color scale
+      // In the range, set the bottom to #fff (white) and the top to the color
+      //  we got from the ordinal scale at the start of the forEach
+      // This will give each contour a unique color that matches the legend
+      let filteredColorScale = d3.scaleLinear().domain(filteredValueExtent)
+                                               .range(['white',color])
+                                               .interpolate(d3.interpolateHcl);
+      
+      // Draw the new contours
+      layer.selectAll(`path.${shotType}`).data(contours)
+           .join("path")
+          .attr("class", shotType)
+          .attr("stroke", "black")
+          .attr("stroke-linejoin", "round")
+          .attr("fill", d => filteredColorScale(d.value))
+          .attr("d", d3.geoPath() );
+      
+    });
     
     
     
