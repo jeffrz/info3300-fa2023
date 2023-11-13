@@ -1,0 +1,250 @@
+<html><head>
+<title>INFO 3300 - November 13</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  
+  <style>
+  
+    .nation {
+      fill: #ddd;
+    }
+
+    .outline {
+      stroke: #fff;
+      stroke-width: 1px;
+      fill: none;
+    }
+      
+    #legend span {
+      margin-right: 10px;
+    }
+  
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+    
+    <h3>Notes for November 13</h3>
+    <p>
+      For contour mapping (whether using geography or not), it's better to keep the <a href="https://github.com/topojson/topojson">TopoJSON</a> import around.
+    </p>
+    <p>
+      More on <a href="https://github.com/d3/d3-contour">d3.contour</a>. Here is a <a href="https://observablehq.com/@d3/volcano-contours/2?intent=fork">contour example</a> and a <a href="https://observablehq.com/@d3/density-contours">density example</a>.
+    </p>
+    <p>
+      In addition to a <a href="https://www.kaggle.com/datafiniti/fast-food-restaurants/data">fast food dataset</a> from earlier this term, today's data come from a subsample of a <a href="https://www.kaggle.com/madison88/201920-nhl-playbyplay-data">Kaggle dataset</a> of all recorded NHL game events for the 2019-2020 season.
+    </p>
+  
+  
+  
+    <h5>HTML for today:</h5>
+    
+    
+    <svg id="fastfood" height="610" width="975" style="background: #fff; margin-top:50px" >
+
+    </svg>
+      
+    <!--- Hockey rink SVG >>> Each pixel is 0.25 feet --->
+    <svg id="hockey" height="350" width="430" style="margin-top:70px" >
+      
+      <g id="contours" transform="translate(20,5)">
+      </g>
+          
+      <g id="rink" transform="translate(20,5)">
+        <line x1="1" x2="1" y1="2" y2="340" style="opacity:0.7;stroke:#aa1111;stroke-width:3;stroke-linecap:round;stroke-dasharray:5,5;"/>
+        <line x1="100" x2="100" y1="0" y2="340" style="opacity:0.7;stroke:#224499;stroke-width:6;"/>
+        <line x1="356" x2="356" y1="2" y2="338" style="opacity:0.7;stroke:#aa1111;stroke-width:3;"/>
+        <path d="M356,158 L338,158 a24,24 1 0,0 0,24 L356,182" style="opacity:0.7;fill:#224499;stroke:#aa1111;stroke-width:3;"/>
+        <rect x="-400" y="0" width="800" height="340" rx="56" ry="56" style="fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke:#000;"/>
+      </g>
+
+    </svg>
+    <div id="legend"> </div>
+
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+  <pre>
+    <code id="display2" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <script id="notes1">
+  // Fast food map
+  const ffsvg = d3.select("#fastfood");
+  const ffwidth = ffsvg.attr("width");
+  const ffheight = ffsvg.attr("height");
+  const ffmapWidth = ffwidth;
+  const ffmapHeight = ffheight;
+  // No margins here since our US map already has a specific projection to match to size
+  const ffmap = ffsvg.append("g");
+
+  const requestData1 = async function() {
+    
+    // We'll use the same map and projection as in the 03-26 notes
+    const us = await d3.json("../datasets/counties-10m.json");
+    var projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+    var path = d3.geoPath().projection(projection);
+    var nation = topojson.feature(us, us.objects.nation);
+    var statesMesh = topojson.mesh(us, us.objects.states);
+    
+    // Draw nation and state outlines
+    ffmap.selectAll("path.nation").data(nation.features)
+         .join("path")
+         .attr("class", "nation")
+         .attr("d", path);
+     ffmap.append("path").datum(statesMesh)
+          .attr("class","outline")
+          .attr("d", path);
+    // No counties this time
+       
+
+    // Now import our fastfood dataset
+    var fastfood = await d3.csv("../datasets/fastfood.csv", d3.autoType);
+    console.log(fastfood)
+    
+    // We're going to draw contours today. For contours, working by PIXEL
+    // coords rather than lat/lng is going to be the best approach 
+    // We do the same conversion as we did in the dot chart...
+    fastfood.forEach( (d, i) => {
+      // Use the projection just like a scale to convert from lng/lat to pixels
+      d.position = projection( [d.longitude, d.latitude] );
+    });
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // // We can show the circles to see whether our densities are plausible
+    // ffmap.selectAll("circle.dot").data(fastfood)
+    //      .join("circle")
+    //      .attr("class","dot")
+    //      .attr("r", 2)
+    //      .attr("fill", "darkgrey")
+    //      .attr("opacity", 0.2)
+    //      .attr("cx", d => d.position[0])
+    //      .attr("cy", d => d.position[1]);””
+    
+    
+  }
+  requestData1();
+  
+  </script>
+
+  <script id="notes2">
+  
+  
+  
+  const requestData2 = async function() {
+  
+    // Now let's chart where different kinds of Hockey goals are attempted
+    // Are slap shots attempted from different places than wrist shots?
+    //  (hint: yes they are, and density contours can illustrate!)
+    let layer = d3.select("#hockey g#contours");
+    
+    let data = await d3.csv("../datasets/nhl_goals_2019.csv", d3.autoType)
+    
+    // Post-process dataset
+    data = data.filter( d => d['event_type'] === 'GOAL' &&
+                             d['event_detail'] !== 'NA');
+    
+    data.forEach( d => {
+      // The X coordinates map to either side of the rink -- we'll use abs
+      //  to put them on the same side (note potential issues with mirroring)
+      d['coords_x'] = Math.abs(d['coords_x']);
+    });
+    console.log(data);
+
+    // Build some scales
+    let xScale = d3.scaleLinear().domain([0,100]).range([0,400]);
+    let yScale = d3.scaleLinear().domain([-42.5,42.5]).range([0,340]); 
+    let ordScale = d3.scaleOrdinal(d3.schemeCategory10); 
+    
+    // // Show circles
+    // data.forEach(function(d,i) {
+    // 
+    //   layer.append("circle")
+    //         .attr("r",4)
+    //         .attr("cx", xScale( d['coords_x'] ))
+    //         .attr("cy", yScale( d['coords_y'] ))
+    //         .style("fill",ordScale( d['event_detail'] ))
+    //         .attr("opacity",0.2);
+    // });
+    
+    
+    
+    
+    
+    
+    
+    
+      
+  
+  
+  
+  
+  
+  
+  
+  }
+  requestData2();
+  
+  
+  
+
+
+
+
+  </script>
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    document.getElementById("display2").innerHTML = sanitize( document.getElementById("notes2").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
