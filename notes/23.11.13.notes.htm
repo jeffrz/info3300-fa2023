@@ -306,11 +306,55 @@
           .attr("stroke-linejoin", "round")
           .attr("fill", d => filteredColorScale(d.value))
           .attr("d", d3.geoPath() );
-      
-    });
-    
-    
-    
+          
+     // Add some spans to the legend, use the same ordinal color
+     d3.select("#legend")
+       .append("span")
+       .text(shotType)
+       .style("color", color)
+       .on("mouseover", function() {
+         // mouseover to show/hide layers
+         layer.selectAll("path")
+              .attr("visibility","hidden")
+         layer.selectAll(`path.${shotType}`)
+              .attr("visibility","visible");
+         
+       });
+     
+     
+   });
+   
+   // default behavior - show the All layer
+   layer.selectAll("path")
+      .attr("visibility","hidden");
+   layer.selectAll("path.All")
+      .attr("visibility","visible");
+   
+   // add an All label so the user can get back to the All view
+   // On your own... try to figure out how to color the text to the max value
+   //  of the color scale we used for the "all" contours so it matches
+   d3.select("#legend")
+     .append("span")
+     .text("All") // in black typeface
+     .on("mouseover", function() {
+       
+       layer.selectAll("path")
+            .attr("visibility","hidden");
+       layer.selectAll("path.All")
+            .attr("visibility","visible");
+            
+     });
+     
+
+
+   // If we were to critique this further, HCI folks ought to question the design
+   //  of the legend. How does is signal that you can do things using it? Is the
+   //  mouseover event the right event for this kind of interaction? Which event
+   //  might be more commonly used by users? How can we draw attention to the 
+   //  changes that are happening onscreen.
+
+
+
     
       
   

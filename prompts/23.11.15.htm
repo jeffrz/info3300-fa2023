@@ -1,0 +1,425 @@
+<html><head>
+<title>INFO 3300 - November 15</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <style>
+    
+  
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+    <h3>Notes for November 15</h3>
+    <p>Today we'll look at raster graphics and vector graphics. <a href="https://designshack.net/articles/layouts/vector-vs-raster-what-do-i-use/">Here</a> is a small guide.</p>
+    <p>Here is some documentation on <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API">canvas elements</a>. In a later lecture we make use of d3-Delaunay, which is documented <a href="https://github.com/d3/d3-delaunay">here</a>.</p>
+    <p>Here are a few articles talking about SVG versus Canvas and choosing between them: <a href="https://www.sitepoint.com/canvas-vs-svg-choosing-the-right-tool-for-the-job/">1</a>, <a href="https://smus.com/canvas-vs-svg-performance/">2 (older)</a> </p>
+    <p>In addition to Canvas and SVG, there is also WebGL which has a few extra capabilities which are very handy. You can make use of fragment shaders for visual effects (and even <a href="http://glslsandbox.com/e#207.3">GPU computation</a>).
+    <p>You can <a href="http://bl.ocks.org/mbostock/5914438">mix the raster and vector together</a> with enough work!</p>
+    <p>Also, there are lots of helper libraries, including <a href="https://github.com/quantmind/d3-canvas-transition">this one</a> which enables .transition() on Canvas.</p>
+    <h5>HTML for today:</h5>
+
+
+    <p> Canvas Chart </p>
+    
+    <div id="container" style="width: 800px; height: 500px;" >
+    </div>
+
+
+
+    <p> Conway Simulation </p>
+    
+    <canvas width="1000" height="500" id="game" style="border:1px solid grey"></canvas>
+    <div id="configPanel">
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <button id="randomize">Randomize</button>
+    </div>
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+  <pre>
+    <code id="display2" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <script id="notes1">
+  
+  // UTILITY FUNCTIONS
+  // Here a slightly modified version of the sample function from underscore.js
+  // It is a very useful, MIT licensed JS utility library
+  // https://github.com/jashkenas/underscore
+  function sample(obj, n, guard) {
+    if (n == null || guard) {
+      if (!isArrayLike(obj)) obj = values(obj);
+      return obj[random(obj.length - 1)];
+    }
+    var sample = obj.slice();
+    var length = sample.length;
+    n = Math.max(Math.min(n, length), 0);
+    var last = length - 1;
+    for (var index = 0; index < n; index++) {
+      var rand = index + Math.floor(Math.random() * (last - index + 1))
+      var temp = sample[index];
+      sample[index] = sample[rand];
+      sample[rand] = temp;
+    }
+    return sample.slice(0, n);
+  }
+  
+
+  // BEGIN CLASS CODE
+  // Container that will hold the canvas and SVG overlay
+  const container = d3.select("#container").style("position","relative");
+  const width = Number(container.style("width").replace("px",""));
+  const height = Number(container.style("height").replace("px",""));
+  const margin = { top: 10, right: 10, bottom: 50, left:50};
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+  
+  // Add a canvas element
+  const canvas = container.append("canvas")
+                          .attr("width",chartWidth)
+                          .attr("height",chartHeight)
+                          .style("position","absolute")
+                          .style("top",margin.top + 'px')
+                          .style("left",margin.left + 'px');
+  
+  
+  // Layer SVG on top of the canvas so we can draw axes and make the canvas interactive
+  const svg = container.append("svg")
+                       .attr("width", width)
+                       .attr("height", height)
+                       .style("position","absolute")
+                       .style("top", 0)
+                       .style("left", 0);               
+  const yAxisArea = svg.append("g").attr("transform","translate("+(margin.left-2)+","+margin.top+")");
+  const xAxisArea = svg.append("g").attr("transform","translate("+margin.left+","+(chartHeight+2+margin.top)+")");
+  const label = svg.append("text").attr("x", margin.left+10).attr("y", margin.top+10);
+  
+  // Add our interactive area, which is just a transparent rect
+  // This will hold our mouseover highlights so we can do them without redrawing the whole canvas
+  const interactiveArea = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+  interactiveArea.append("rect")
+                 .attr("width",chartWidth)
+                 .attr("height",chartHeight)
+                 .attr("x",0)
+                 .attr("y",0)
+                 .attr("opacity",0);         
+                
+                                   
+  const drawPlot = async () => {
+   
+    let data = await d3.csv("../datasets/board-games-simplified.csv");
+    console.log(data.length);
+
+    const parseTime = d3.timeParse("%Y");
+    data.forEach( (d, i) => {
+      d['year_published'] = parseTime(d['year_published']);
+      d['average_rating'] = Number(d['average_rating']);
+      d['playing_time'] = Number(d['playing_time']);
+    });
+    
+    // data = sample(data, 500);
+
+    const xScale = d3.scaleTime().domain(d3.extent(data, d => d['year_published'])).range([10, chartWidth-10]);
+    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d['average_rating'])).range([chartHeight-10, 10]);
+    const logScale = d3.scaleLog().domain(d3.extent(data, d => d['playing_time'])).range([0, 1]);
+    const colorScale =  d3.scaleSequential( d => d3.interpolateYlGnBu(logScale(d)) ); // how to do log color
+
+    let yAxis = d3.axisLeft(yScale); 
+    yAxisArea.append("g").attr("class", "y axis").call(yAxis);
+
+    let xAxis = d3.axisBottom(xScale); 
+    xAxisArea.append("g").attr("class", "x axis").call(xAxis);
+
+    // BEGIN LECTURE CODE
+    
+    // Just to check, here's code to make SVG circles
+    interactiveArea.selectAll("circle.point").data(data)
+                   .join("circle").attr("class","point")
+                   .attr("r", 3)
+                   .attr("cx", d => xScale(d['year_published']))
+                   .attr("cy", d => yScale(d['average_rating']))
+                   .attr("fill", d => colorScale(d['playing_time']))
+                   
+                   
+    
+    // **  Get the "drawing context" for the canvas and draw!
+    
+    
+    
+    
+    
+    
+    // LAST PART OF LECTURE
+    // **  Add mouseovers to highlight points
+    
+    
+    
+    
+    // // Helper code to show the triangulation in action
+    // const voronoi = delaunay.voronoi([0,0,chartWidth,chartHeight]);
+    // interactiveArea.append("path").attr("stroke","black").attr("fill","none")
+    //                .attr("d",voronoi.render())
+    
+
+    // Since we don't have events for each circle, we need to simulate mouseOver and mouseOut...
+    
+    
+    
+    
+    
+    // i = index in data array of circle moused over
+    function mouseEntered(i) {
+      let d = data[i];
+      interactiveArea.append("circle")
+                    .attr("id","highlight")
+                    .attr("cx",xScale(d['year_published']))
+                    .attr("cy",yScale(d['average_rating']))
+                    .attr("r",5)
+                    .attr("stroke","black")
+                    .attr("fill","none");
+      label.text(d['name']);
+                    
+    }
+    function mouseExited() {
+      d3.select("#highlight").remove();
+      label.text("");
+    }
+
+
+
+  }
+  drawPlot();
+
+  </script>
+
+  
+  
+  
+  <script id="notes2">
+  
+  
+  // Code for Conway's Game of LifeV
+  // https://www.conwaylife.com/wiki/Conway%27s_Game_of_Life
+  
+  // This is an example of ECMA 6 classes: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
+  // Behind the scenes these still work like traditional JS classes (which are actually just "special functions")
+  class Conway {
+    constructor(width, height) {
+      this.gameWidth = width;
+      this.gameHeight = height;
+      
+      // Make an empty game board (2d array)
+      this.board = [];
+      for (let y=0; y<height; y++) {
+        let row = [];
+        for (let x=0; x<width; x++) {
+          row.push(0);
+        }
+        this.board.push(row);
+      }
+      
+      // To step the simulation, we need a temporary buffer -- for convenience we just make a second array
+      // You could do some clever things and use the canvas as a cache
+      //  (You could even use framebuffers [a sort of VRAM canvas] or do the entire simulation
+      //    in the form of GPU shaders to take advantage of massively parallel FPUs)
+      this.buffer = [];
+      for (let y=0; y<height; y++) {
+        let row = [];
+        for (let x=0; x<width; x++) {
+          row.push( 0 );
+        }
+        this.buffer.push(row);
+      }
+      // NOTE: You could really use the Uint8ClampedArray from the <canvas> as board storage and just
+      //       keep a temporary buffer running (which can actually be a sparse representation)
+    }
+    
+    // Method - Empty out the board
+    emptyBoard() {
+      for (let y=0; y<this.gameHeight; y++) {
+        for (let x=0; x<this.gameWidth; x++) {
+          this.board[y][x] = 0;
+        }
+      }
+    }
+    
+    // Method - Randomizes the contents of the board
+    randomizeBoard(lifeProbability) {
+      for (let y=0; y<this.gameHeight; y++) {
+        for (let x=0; x<this.gameWidth; x++) {
+          if (Math.random() < lifeProbability) { this.board[y][x] = 1; }
+          else { this.board[y][x] = 0; }
+        }
+      }
+    }
+    
+    // Method - Step the simulation forward in time
+    step(board) {
+      for (let y=0; y<this.gameHeight; y++) {
+        for (let x=0; x<this.gameWidth; x++) {
+          
+          // // Raw rules following the original Conway Game
+          // let state = this.board[y][x];
+          // let sum = -state; // to simplify the loops we include the middle cell, so we remove it during init
+          // for (let my=Math.max(0,y-1); my<=Math.min(y+1,gameHeight-1); my++) {
+          //   for (let mx=Math.max(0,x-1); mx<=Math.min(x+1,gameWidth-1); mx++) {
+          //     sum = sum + this.board[my][mx];
+          //   }
+          // }
+          // let newState = 0;
+          // if (state) { // Rule 1, 2, 3
+          //   if (sum === 2 || sum === 3) { newState = 1; }
+          // }
+          // else { // Rule 4
+          //   if (sum === 3) { newState = 1; }
+          // }
+          
+          // Shortcut rules that remove a few conditionals in the original Conway Game
+          let sum = 0;
+          for (let my=Math.max(0,y-1); my<=Math.min(y+1,gameHeight-1); my++) {
+            for (let mx=Math.max(0,x-1); mx<=Math.min(x+1,gameWidth-1); mx++) {
+              sum = sum + this.board[my][mx];
+            }
+          }
+          if (sum === 3) { this.buffer[y][x] = 1; }
+          else if ( sum === 4 ) { this.buffer[y][x] = this.board[y][x]; }
+          else { this.buffer[y][x] = 0; }
+        }
+      }
+      
+      // Paste changes back to original board and gather some sums
+      // (A smaller buffering system would make this faster)
+      // (Some hashing to check for active regions would dramatically help as well)
+      this.numAlive = 0;
+      this.numDead = 0;
+      for (let y=0; y<this.gameHeight; y++) {
+        for (let x=0; x<this.gameWidth; x++) {
+          let value = this.buffer[y][x];
+          this.board[y][x] = value;
+          this.numAlive += value;
+          this.numDead += (1 - value);
+        }
+      }
+    }   
+    
+    // Method - Paint a circle of random points
+    //  (This would probably be faster if you pre-generated a mask of points rather than doing dSq comparisons)
+    paint(xPos, yPos, rad, lifeProbability) {
+      const rSq = rad * rad;
+      for (let y=Math.max(0,Math.floor(yPos-rad)); y<=Math.min(this.gameHeight-1,Math.floor(yPos+rad)); y++) {
+        for (let x=Math.max(0,Math.floor(xPos-rad)); x<=Math.min(this.gameWidth-1,Math.floor(xPos+rad)); x++) {
+          let dSq = (y - yPos) * (y - yPos) + (x - xPos) * (x - xPos);
+          if (dSq <= rSq) {
+            if (Math.random() < lifeProbability) { this.board[y][x] = 1; }
+            // else { this.board[y][x] = 0; }
+          }
+        }
+      }
+      
+    }
+    // End class
+  }
+  // ----------- End Game of Life code -------------   
+  
+  
+  // Container that will hold the canvas and SVG overlay
+  const gameCanvas = d3.select("#game");
+  const gameWidth = gameCanvas.attr("width");
+  const gameHeight = gameCanvas.attr("height");
+  
+  // LECTURE CODE HERE
+  
+  // Configure the simulation
+
+  
+  // Stop simulation
+  function endSimulation() {
+    
+  }
+  // Start simulation back up
+  function startSimulation() {
+
+  }
+  // Randomize sim state
+  function randomizeSimulation() {
+
+  }
+  
+  // Code up the simulation drawing functions
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // // If you've got a hexadecimal color, e.g. #00CC00, then you can use this code to get RGB:
+  // var num = parseInt("#00CC00".replace('#',''), 16);
+  // var r = (num >> 16) & 255;
+  // var g = (num >> 8) & 255;
+  // var b = num & 255;
+  
+  // Button handlers for interactive environment
+  d3.select("#start").on("click", function() {
+    startSimulation();
+  });
+  d3.select("#stop").on("click", function() {
+    endSimulation();
+  });
+  d3.select("#randomize").on("click", function() {
+    randomizeSimulation();
+  });
+  
+  // gameCanvas.on("mousemove", function(event) {
+  //   let loc = d3.pointer(event);
+  //   game.paint(loc[0],loc[1],25,0.15);
+  // })
+  
+  
+  
+  
+  </script>
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    document.getElementById("display2").innerHTML = sanitize( document.getElementById("notes2").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
