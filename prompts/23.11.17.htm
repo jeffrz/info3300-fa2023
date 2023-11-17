@@ -1,0 +1,211 @@
+<html><head>
+<title>INFO 3300 - November 17</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="../libs/three.min.js"></script>
+  <script src="../libs/three.OrbitControls.js"></script>
+  <script src="../libs/threex.domevents.js"></script>
+  
+  <style>
+  
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+    
+    <h3>Notes for November 17</h3>
+    <p>Let's make a fully 3D visualization to see whether it works at all. </p>
+    <p>We can't really make use of SVG. Instead, we will use <a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/">WebGL</a>. In general WebGL is way too complex to use unless you have graphics and <a href="https://thebookofshaders.com/00/">shader</a> dev experience. Shaders are notoriously challenging to get right.</p>
+    <p>To make things a bit easier, we will use <a href="https://threejs.org/">three.js</a>, a graphics library that uses WebGL. Lots of web tools use it, and it is quite performant. <a href="https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene">Documentation</a> and <a href="https://threejs.org/examples/">Examples</a></p>
+    <p>In practice, doing things in 2.5d, or an isometric projection, might be a bit easier (but it comes with its own trade-offs). We won't demo that today, but you can try out the <a href="http://jdan.github.io/isomer/">Isomer</a> library which actually works pretty well with d3 conventions.</p>
+    
+  
+  
+  
+    <h5>HTML for today:</h5>
+    
+    
+    
+    <div id="plotContainer">
+      
+    </div>
+    <p id="label">
+    </p>
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <script id="notes1">
+
+
+  
+
+  const requestData = async () => {
+    
+    // Import some datasets of world demographic factors compared with PISA standardized test results
+    const raw_pisa      = await d3.tsv("../datasets/pisa.txt");
+    const raw_gdp       = await d3.tsv("../datasets/gdp.txt");
+    const raw_education = await d3.tsv("../datasets/education.txt");
+    const raw_gini      = await d3.tsv("../datasets/gini.txt");
+    const raw_hdi       = await d3.tsv("../datasets/hdi.txt");
+    // d3.index makes a Map data structure, which is just a dictionary that has order to it
+    //  You access keys in a JS map using .get()
+    const gdp       = d3.index(raw_gdp, d => d.Country.trim());
+    const education = d3.index(raw_education, d => d.Country.trim());
+    const gini      = d3.index(raw_gini, d => d.Country.trim());
+    const hdi       = d3.index(raw_hdi, d => d.Country.trim());
+    // Make final dataset by aggregating
+    var testScores = [];
+    raw_pisa.forEach(function (d) {
+      let country = d["Country"].trim();
+      // Skip countries with known bad data elements
+      if (["Singapore", "Hong Kong", "Malta", "United Arab Emirates", "Montenegro", "Lebanon"].includes(country)) {
+        return;  // ( 'return' is like calling 'continue' when you are using a .forEach )
+      }
+      // Still some missing data, so a try/catch block ought to work fine for the .get() calls
+      try {
+        row = { "Country": country };
+        row["PISA"] = parseFloat(d["PISA"]);
+        row["LogIncome"] = Math.log(parseFloat(gdp.get(country).GDP.replace(/,/g,""))) ;
+        row["EduSpend"] = parseFloat(education.get(country).Education);
+        row["Inequality"] = parseFloat(gini.get(country).WBGini);
+        row["HDI"] = parseFloat(hdi.get(country).HDI);
+        testScores.push(row);
+      } catch (error) { }
+    });
+    
+    
+    // Let's make a 3D scatterplot! I'm sure this will go well.
+    
+    // First, let's use d3 to make the data a bit easier to work with
+    // The 3d library is going to expect plain positions and colors, so use d3 scales to precompute x,y,z,s,c
+    let xScale = d3.scaleLinear().domain(d3.extent(testScores, d=>d['LogIncome'])).range( [-200,200] );
+    let yScale = d3.scaleLinear().domain(d3.extent(testScores, d=>d['EduSpend'])).range( [-200,200] );
+    let zScale = d3.scaleLinear().domain(d3.extent(testScores, d=>d['HDI'])).range( [-200,200] );
+    let sizeScale = d3.scaleLinear().domain(d3.extent(testScores, d=>d['Inequality'])).range( [1,2] );
+    let colorScale = d3.scaleLinear().domain(d3.extent(testScores, d=>d['PISA'])).range( ["gold", "steelblue"] );
+    let data = [];
+    testScores.forEach( d=> {
+      color = d3.rgb(colorScale(d['PISA']));
+      data.push({
+        name: d['Country'],
+        x: xScale(d['LogIncome']),
+        y: yScale(d['EduSpend']),
+        z: zScale(d['HDI']),
+        sz: sizeScale(d['Inequality']),
+        // Fun wrinkle -- the 3d library expects colors as a plain unsigned number, use bitshifts to create it
+        col: color.r + (color.g << 8) + (color.b << 16)
+      });
+    });
+    console.log(data);
+    
+    
+    // 1. Initialize three.js scene using plain HTML
+    // Place for scene to live
+    
+    
+    
+    
+    
+    
+    
+    
+    // 2. Compose the scene
+    
+    // Make some lights -- we'll use them for a trick later, so let's make three of them
+    
+    // function makeLight( xPos, yPos, zPos ) {
+    // 
+    //   let light = new THREE.DirectionalLight( 0xffffff, 1 );
+    //   light.position.set(xPos, yPos, zPos);
+    // 
+    //   // Options for adding shadows
+    //   light.castShadow = true;
+    //   light.shadow.camera.left = -width / 2;
+    //   light.shadow.camera.right = width / 2;
+    //   light.shadow.camera.top = -height / 2;
+    //   light.shadow.camera.bottom = height / 2;
+    //   light.shadow.camera.near = 1;
+    //   light.shadow.camera.far = 4000;
+    //   light.shadow.mapSize.width = 1024;
+    //   light.shadow.mapSize.height = 1024;
+    // 
+    //   return light;
+    // }
+    
+    
+    
+    
+    
+    
+    
+    
+    // 3. Begin animating
+    
+    
+    
+    
+    
+    
+    
+    // 4. Add some boxes to catch shadows (remember to enable shadows for lights). That ought to improve things a lot.
+    
+    
+    
+    
+    
+    
+    // 5. Add some mouseovers! That will fix everything, right?
+    
+    
+    
+    
+    
+    
+
+  }
+
+  requestData();
+
+
+
+
+  </script>
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
