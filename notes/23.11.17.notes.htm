@@ -53,8 +53,8 @@
 
   <script id="notes1">
 
-
   
+    
 
   const requestData = async () => {
     
@@ -118,10 +118,39 @@
     
     // 1. Initialize three.js scene using plain HTML
     // Place for scene to live
+    let container = document.getElementById("plotContainer");
+    let width = 800;
+    let height = 500;
+    
+    // THREE scene object
+    let scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0xf0f0f0 );
     
     
+    // Make a camera for the scene
+    // camera parameters are FOV, aspect, minRenderLen, maxRenderLen
+    let camera = new THREE.PerspectiveCamera( 50, width/height, 0.1, 2000 );
+    camera.position.x = 400;
+    camera.position.y = 400;
+    camera.position.z = 600;
     
     
+    // Use a plugin library to get mouse controls
+    //   Lots to be configured here, we will leave it at default
+    let control = new THREE.OrbitControls( camera );
+    
+    
+    // Create a renderer for displaying content
+    let renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( width, height );
+    
+    // Options for adding shadows to renderer
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    
+    // Add the renderer to the HTML DOM
+    container.appendChild( renderer.domElement );
     
     
     
@@ -130,54 +159,137 @@
     
     // Make some lights -- we'll use them for a trick later, so let's make three of them
     
-    // function makeLight( xPos, yPos, zPos ) {
-    // 
-    //   let light = new THREE.DirectionalLight( 0xffffff, 1 );
-    //   light.position.set(xPos, yPos, zPos);
-    // 
-    //   // Options for adding shadows
-    //   light.castShadow = true;
-    //   light.shadow.camera.left = -width / 2;
-    //   light.shadow.camera.right = width / 2;
-    //   light.shadow.camera.top = -height / 2;
-    //   light.shadow.camera.bottom = height / 2;
-    //   light.shadow.camera.near = 1;
-    //   light.shadow.camera.far = 4000;
-    //   light.shadow.mapSize.width = 1024;
-    //   light.shadow.mapSize.height = 1024;
-    // 
-    //   return light;
-    // }
+    function makeLight( xPos, yPos, zPos ) {
+      
+      let light = new THREE.DirectionalLight( 0xffffff, 1 );
+      light.position.set(xPos, yPos, zPos);
+      
+      // Options for adding shadows
+      light.castShadow = true;
+      light.shadow.camera.left = -width / 2;
+      light.shadow.camera.right = width / 2;
+      light.shadow.camera.top = -height / 2;
+      light.shadow.camera.bottom = height / 2;
+      light.shadow.camera.near = 1;
+      light.shadow.camera.far = 4000;
+      light.shadow.mapSize.width = 1024;
+      light.shadow.mapSize.height = 1024;
+      
+      return light;
+    }
+    
+    
+    let lightX = makeLight(500, 0, 0);
+    let lightY = makeLight(0, 500, 0);
+    let lightZ = makeLight(0, 0, 500);
+    
+    scene.add( lightX );
+    scene.add( lightY );
+    scene.add( lightZ );
     
     
     
+    // Create meshes for the points
+
+    // sphereBufferGeometry( radius, widthSeg, heightSeg )
+    let geometry = new THREE.SphereBufferGeometry( 10, 12, 12 );
     
-    
+    let meshes = [];
+    data.forEach( d => {
+      
+        let material = new THREE.MeshLambertMaterial( { color: d.col } );
+        let mesh = new THREE.Mesh( geometry, material );
+        
+        mesh.data = d;
+        
+        mesh.position.x = d.x;
+        mesh.position.y = d.y;
+        mesh.position.z = d.z;
+        
+        mesh.rotation.x = 0;
+        mesh.rotation.y = 0;
+        mesh.rotation.z = 0;
+        
+        mesh.scale.x = d.sz;
+        mesh.scale.y = d.sz;
+        mesh.scale.z = d.sz;
+        
+        mesh.castShadow = true;
+        mesh.receiveShadow = false;
+        
+        scene.add( mesh );
+        meshes.push( mesh );
+    } );
     
     
     
     // 3. Begin animating
     
+    function animate() {
+      
+      // Queues up the next frame of the animation, whenever the browser is ready to run it
+      // When the browser says, it will call the animate() function again
+      requestAnimationFrame( animate );
+      
+      // ...meanwhile, go ahead and render this frame using the render() function below
+      render();
+    }
     
+    function render() {
+      // These two lines update the scene with any mouse movement/zooms and render to the canvas
+      control.update();
+      renderer.render( scene, camera );
+    }
     
-    
+    // This starts the infinite loop to animate the scene
+    // Behind the scenes this is what d3 is doing when you use timer, .transition() or a forceSimulation sending ticks 
+    animate();
     
     
     
     // 4. Add some boxes to catch shadows (remember to enable shadows for lights). That ought to improve things a lot.
+    let box = new THREE.BoxBufferGeometry( 500, 10, 500 );
+    let material = new THREE.MeshLambertMaterial( {color: 0xf3f3f3} );
     
+    let cubeX = new THREE.Mesh( box, material );
+    cubeX.position.y = -250;
+    cubeX.receiveShadow = true;
+    scene.add( cubeX );
     
+    let cubeY = new THREE.Mesh( box, material );
+    cubeY.position.x = -250;
+    cubeY.rotation.z = Math.PI / 2.0;
+    cubeY.receiveShadow = true;
+    scene.add( cubeY );
     
+    let cubeZ = new THREE.Mesh( box, material );
+    cubeZ.position.z = -250;
+    cubeZ.rotation.x = Math.PI / 2.0;
+    cubeZ.receiveShadow = true;
+    scene.add( cubeZ );
     
-    
-    
+  
     // 5. Add some mouseovers! That will fix everything, right?
+    var domEvents = new THREEx.DomEvents( camera, renderer.domElement );
+    
+    meshes.forEach( mesh => {
+    
+      domEvents.addEventListener(mesh, 'mouseover', function(event) {
+        
+        d3.select("#label").text(mesh.data.name);
+        mesh.material.color.setHex( 0xff0000 );
+    
+      }, false);
+      domEvents.addEventListener(mesh, 'mouseout', function(event) {
+    
+        mesh.material.color.setHex( mesh.data.col );
+    
+      }, false);
+    
+    });
     
     
-    
-    
-    
-    
+  
 
   }
 
