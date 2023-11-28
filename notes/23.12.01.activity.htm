@@ -1,0 +1,205 @@
+<html>
+<head>
+  <title>INFO 3300 - Designing Under Constraints Activity</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/validator@latest/validator.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    button:disabled {
+      color: lightgrey; 
+    }
+  </style>
+</head>
+<body class="larger-font">
+  <div class="container larger">
+    <h4>INFO 3300 - Designing Under Constraints Activity</h4>
+    
+    <div class="doc-section">
+      <h5 style="padding-top:0;">Instructions</h5>
+      <p>
+        Your group will brainstorm an interactive dashboard for viewing election results in a far future election. The complication is that you must design with a specific constraint which will limit what you can do. Here are the rules:
+        <ul>
+          <li>Effectively visualize some aspect of the data for users. You will not be able to visualize everything. You are not required to show all of the data.</li>
+          <li>Consider interactivity. How will users get an overview? How will they "zoom in" to see more details? How do they backtrack or remember where they have been? Can you go beyond filtering and incorporate new interactions we haven't seen before?</li>
+          <li>Consider how best to manage the information that a user sees. Don't try to throw everything at the problem. Instead, be cautious in how you include new visual elements and interactions. <strong>You should be able to justify every design decision you make</strong>.</li>
+          <li>Make sure that your final submission <strong>complies with your constraint's restrictions</strong>.</li>
+        </ul> 
+      </p>
+      <p>
+        Please follow this procedure:
+      </p>
+        <strong>Step 1 - [GROUP] Identify Key Goals</strong>
+        <ol class="narrow-list">
+          <li>As a group, read the instructions and <strong>Brief</strong> included below.</li>
+          <li>Then, put in your breakout room number and use the button to <strong>get a Constraint</strong>.</li>
+          <li>Together, come up with a <strong>use case</strong> for your visualization. Discuss how you will accommodate the constraint.</li>
+          <li>Rank those tasks in order of importance using any method you'd like (e.g. voting, by consensus)</li>
+          <li>In any remaining time, check out some of the pages listed at the bottom of these instructions and <a href="https://edstem.org/us/courses/25946/discussion/?category=Visualization%20Examples">posted to Ed Discussion</a>.</li>
+        </ol>
+        <br/>
+        <strong>Step 2 -  [INDIVIDUAL] Two sketches</strong>
+        <ol class="narrow-list">
+          <li>Now, working individually, begin making <strong>two very rough visualization sketches</strong> that best satisfy those tasks. Keep them low fidelity. You can use any medium you like (e.g.pen and paper, tablets, UI prototyping software, presentation tools, a whiteboard).</li>
+          <li>Refer back to the <strong>dataset</strong> and think about what you want to show.</li>
+          <li>Keep polishing your ideas until your group reconvenes.</li>
+        </ol>
+        <br/>
+        <strong>Step 3 - [GROUP] Final design</strong>
+        <ol class="narrow-list">
+          <li>As a group, go around and discuss each person's sketches. Keep it to 1 minute per sketch.</li>
+          <li>Working together, create a <strong>consensus sketch</strong>.</li>
+          <li>Make sure that you nominate one person to talk about your group's idea at the end of class.</li>
+        </ol>
+        <strong>Step 4 - [CLASS] Reconvene</strong>
+        <ol>
+          <li>We will reconvene at the end to check out everyone's ideas.</li>
+        </ol>
+      </p>
+    </div>
+    
+    <div class="doc-section" >
+      <h5 style="padding-top:0;">Your brief</h5>
+      <p>
+        It's October, 2036 and an <a href="https://en.wikipedia.org/wiki/United_States_presidential_election">election is on in the USA</a>. Two front-runners, Candidate Smith of the Big Goose Party (party color <strong style="color:goldenrod;">goldenrod</strong>) and Candidate Thompson of the Whim Party (party color <strong style="color:navy;">indigo</strong>), are closely competing for the presidency. As a part of a media agency, you have been tasked constructing a web-based dashboard which uses visualization to show users either:
+          <ul>
+            <li>Election results as they come in during election night.</li>
+            <li>Poll results in the run up to the election.</li>
+          </ul>
+        Your group can choose which of these cases they would like to pursue.
+      </p>
+    </div>
+    
+    
+    <div class="doc-section">
+      <h5 style="padding-top:0;">Constraints:</h5>
+      <p> Please enter your breakout room number and press the button to get your group's constraint </p>
+      <p> Room number <input id="room" type="text"></input> </p>
+      <div>
+        <button id="getconst">Get a Constraint</button>
+        <span id="error"></span>
+      </div>
+      <p style="font-size: 22px;">Constraint: <span id="const"></span> </p>
+    </div>
+    
+    <div class="doc-section" >
+      <h5 style="padding-top:0;">Election Result Data</h5>
+      <p>Each "row" of data is an update of election results for a specific "precinct" (a part of a state).</p>
+      <table>
+        <tr><td>Precinct name</td><td></td></tr>
+        <tr><td>State it is in</td><td></td></tr>
+        <tr><td>Total size of precinct</td><td></td></tr>
+        <tr><td>Amount of votes currently counted</td><td></td></tr>
+        <tr><td>Amount of votes left to count</td><td></td></tr>
+        <tr><td># Votes for Smith</td><td></td></tr>
+        <tr><td># Votes for Thompson</td><td></td></tr>
+        <tr><td>Prediction for the precinct</td><td>Algorithmic prediction of who will win this precinct (e.g. too close to call, clear Thompson win)</td></tr>
+        <tr><td>Margin of error for prediction</td><td></td></tr>
+      </table>
+      <p>As new precinct results come in, you generate updated state data.</p>
+      <table>
+        <tr><td>State name</td><td></td></tr>
+        <tr><td>Number of electoral votes for state</td><td></td></tr>
+        <tr><td>Total # of votes currently counted</td><td></td></tr>
+        <tr><td>Total # of votes left to count</td><td></td></tr>
+        <tr><td># Votes for Smith</td><td></td></tr>
+        <tr><td># Votes for Thompson</td><td></td></tr>
+        <tr><td>Prediction for the state:</td><td>Algorithmic prediction of who will win this state (e.g. too close to call, clear Thompson win)</td></tr>
+        <tr><td>Margin of error for prediction</td><td></td></tr>
+      </table>
+      <p>Finally, you have country-wide data which is updating frequently.</p>
+      <table>
+        <tr><td>Number of electoral votes won by Thompson</td><td></td></tr>
+        <tr><td>Number of electoral votes won by Smith</td><td></td></tr>
+        <tr><td>Total # of votes currently counted</td><td></td></tr>
+        <tr><td>Total # of votes left to count</td><td></td></tr>
+        <tr><td>Prediction for the country</td><td>Algorithmic prediction of who will win</td></tr>
+        <tr><td>Margin of error for prediction</td><td></td></tr>
+      </table>
+    </div>
+    
+    <div class="doc-section" >
+      <h5 style="padding-top:0;">Poll Data</h5>
+      <p>Each "row" of data is a poll. Polls can be nation-wide or on a state level. Assume they are coming in regularly and you have data for some but not all states each day. Thus far you've got about 2 months worth.</p>
+      <table>
+        <tr><td>Poll title:</td><td>Name of the poll</td></tr>
+        <tr><td>Date:</td><td>When the poll was conducted (can be a range)</td></tr>
+        <tr><td>Rating:</td><td>Your company's "rating" of poll quality</td></tr>
+        <tr><td>Sample size:</td><td>Number of people polled</td></tr>
+        <tr><td>Sample details:</td><td>What kind of people were polled (e.g. registered voters, likely voters, adults)</td></tr>
+        <tr><td>Sample region:</td><td>Area where the sampling was done (e.g. country-wide, NY voters)</td></tr>
+        <tr><td>Results:</td><td>Polling results (e.g. Thompson 44%, Smith 48%</td></tr>
+        <tr><td>Margin of error:</td><td>Possible error in results</td></tr>
+        <tr><td>Adjusted results:</td><td>Polling results corrected by your proprietary algorithm</td></tr>
+      </table>
+      <p>You also have access to these data from a computational model for every day of the past two months.</p>
+      <table>
+        <tr><td>Estimated candidate results:</td><td>An estimate of the "true" poll results by aggregating polls</td></tr>
+        <tr><td>Margin of error for estimate:</td><td>Possible error in estimate</td></tr>
+      </table>
+    </div>
+    
+    <div class="doc-section">
+      <h5 style="padding-top:0;">Examples:</h5>
+      <ol>
+        <li><a href="https://projects.fivethirtyeight.com/polls/president-general/national/">538</a></li>
+        <li><a href="https://projects.fivethirtyeight.com/polls/">538 (2)</a></li>
+        <li><a href="https://www.nytimes.com/interactive/2020/us/elections/election-states-biden-trump.html">NYT page</a></li>
+        <li><a href="https://www.realclearpolitics.com/epolls/latest_polls/">Real Clear Politics</a></li>
+        <li><a href="https://www.pollingreport.com/">Polling Report</a></li>
+      </ol>
+    </div>
+    
+  </div>
+  
+  <script>
+  
+  // Look at you, checking out the code to see how the constraints button works!
+  let constraints = ["You are designing for mobile devices with small screens.",
+                     "Your users have a visual impairment. Do not make elements that are too small.",
+                     "Your boss wants to impress their bosses. Your visualization must include a table, a map, and at least 3 sliders.",
+                     "Your design team will not allow you to use a map in your visualization.",
+                     "Your users have terrible monitors that can only show yellow, red, blue, and black (and cannot mix them).",
+                     "Your users are a community of luddites who haven't seen charts before.",
+                     "Your boss has a shareholder meeting. Include many animations and interactions as possible to impress them."];
+  
+  let control = d3.select("#room");
+  let button = d3.select("#getconst").property("disabled","true");
+  let error = d3.select("#error");
+  let msg = d3.select("#const");
+  
+  control.on("input", function() {
+  
+    let txt = d3.select(this).property("value");
+    console.log(txt)
+    if (!validator.isInt(txt)) {
+      error.text("Please input a valid room number.")
+      button.property("disabled","true");
+    }
+    else {
+      error.text("")
+      button.property("disabled","");
+    }
+  
+  })
+  
+  button.on("click", function() {
+    let txt = control.property("value");
+    console.log(txt)
+    if (txt.length > 0 && validator.isInt(txt)) {
+    
+        let rm = Math.abs(parseInt(txt) - 1)
+        let constraint = constraints[ (rm) % constraints.length ];
+        msg.text(constraint);
+      
+    }
+  })
+  
+  
+  
+  </script>
+</body>
+    

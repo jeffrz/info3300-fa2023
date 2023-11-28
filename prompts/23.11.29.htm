@@ -1,0 +1,170 @@
+<html><head>
+<title>INFO 3300 - November 29</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <link rel="stylesheet" href="../css/hljs-base16.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.0.0/build/d3-flextree.min.js"></script>
+  <style>
+    text {
+        font-family: 'Lato', sans-serif;
+    }
+    .no-select {
+        user-select: none;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="container larger">
+    
+    <h3>Notes for November 29</h3>
+    <p>
+      Today we will work with some text data that has been formatted into a tree structure (inspired by <a href="https://www.jasondavies.com/wordtree/?source=cat-in-the-hat.txt&prefix=Thing">this online tool</a>). I ran a simple script to break documents into sentences. Then, I fed each sentence into a tokenizer (to get individual words). Using the sentences, I built a tree structure. Every sentence starts at the same root node, branching off based on which word comes next. This creates a graph as sentences re-use the same starting words. We'll start with song lyrics for this example because they often have a repetitive structure that's easy to observe.
+    </p>
+    <p>
+      This is a general trend in text visualization -- while we can just show plain words, we often want to post-process the text to observe deeper structures that may not be obvious in a simple read-through of a larger document.
+    </p>
+    <p>
+      To take the tree data structure and create a tree visualization, we make use of functions in the <a href="https://github.com/d3/d3-hierarchy">d3-hierarchy</a> package.
+    </p>
+    <p>
+      The final code makes use of the <a href="https://github.com/klortho/d3-flextree">Flextree</a> addon library for the d3-hierarchy tree layout algorithm. We used this library to overcome issues related to spacing and sizing the text "nodes". It does a nice job optimizing for a simple tree layout that makes more efficient use of screen real estate.
+    </p>
+  
+    <h5>HTML for today:</h5>
+    
+    <div id="treeContainer">
+      <svg id="plot" width="1200" height="1000" style="margin-bottom:20px" >
+      </svg>
+    </div>
+    
+
+
+
+  <!-- This block will be automatically filled with syntax-highlighted code from the script below -->
+  <h5>Code for today:</h5>
+  <pre>
+    <code id="display1" class="hljs javascript">
+    </code>
+  </pre>
+
+
+  <script id="notes1">
+  
+  // This code is a worked version of the canonical d3 example at https://observablehq.com/@d3/collapsible-tree
+  const createVis = async () => {
+    
+    
+  // dataset = await d3.json("../datasets/phantom.json", d3.autoType )  // A surprise to be sure, but a welcome one
+  dataset = await d3.json("../datasets/astley.json", d3.autoType )   //  See https://youtu.be/dQw4w9WgXcQ
+  console.log(dataset);
+  
+  let svg = d3.select("svg#plot");
+  let width = svg.attr("width");
+  
+  // Make some places for nodes/links to live (and to guarantee links are always below nodes)
+  let linkGroup = svg.append("g").attr("class","links")
+  let nodeGroup = svg.append("g").attr("class","nodes")
+
+  // // Make a hidden SVG to use for measuring
+  // // (we'll use this in the FlexTree part of the lecture)
+  // let virtualText = d3.select("body").append("svg").attr("width",0).attr("height",0)
+  //                     .append("text").attr("class","node-label");
+  // 
+  // virtualText.text("thisisatest");
+  // console.log(virtualText.node().getComputedTextLength())
+  
+  // BEGIN LECTURE
+  
+  
+  
+  
+  
+  
+  // Update function for chart so we can later trigger it during interactions
+  let updateChart = async function() {
+  
+    
+
+  }
+  
+  updateChart();
+  
+  
+  
+  // // ** Add a quick "OPEN/CLOSE ALL" button for fun **
+  // // Unfortunately, tree.descendants won't work if .children is null, so we make a quick tree traversal
+  // function expand(node) {
+  //   if (node.backupChildren) {
+  //     node.children = node.backupChildren;
+  //     node.children.forEach( n2 => {
+  //       expand(n2);
+  //     })
+  //   }
+  // }
+  // // Now add a toggle-able button
+  // d3.select("#treeContainer")
+  //    .append("button").lower()
+  //    .text("OPEN ALL NODES")
+  //    .attr("cursor","pointer")
+  //    .attr("x",10)
+  //    .attr("y",20)
+  //    .attr("class","collapsed") // store state as a class
+  //    .on("click", function() {
+  //      let e = d3.select(this);
+  //      if (e.classed("collapsed")) {
+  //        // OPEN ALL
+  //        expand(root);
+  //        updateChart(root);
+  //        e.text("CLOSE ALL NODES")
+  //         .classed("collapsed", false)
+  //      }
+  //      else {
+  //        // CLOSE ALL
+  //        root.descendants().forEach( node => {
+  //          if (node.depth > 0) { node.children = null; }
+  //        });
+  //        updateChart(root);
+  //        e.text("OPEN ALL NODES")
+  //         .classed("collapsed", true)
+  //      }
+  //    })
+  
+  
+  }
+  
+  createVis();
+  
+  
+
+  </script>
+  
+  
+
+  <!--- calls the highlight library to fill the <pre> tag with code --->
+  <script>
+  
+  function sanitize(s) {
+    return s.replace("<br>", "\\n")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+          }
+    document.getElementById("display1").innerHTML = sanitize( document.getElementById("notes1").innerText);
+    hljs.highlightAll();
+  </script>
+
+
+  </div>
+</body>
+</html>
