@@ -62,9 +62,8 @@
   // This code is a worked version of the canonical d3 example at https://observablehq.com/@d3/collapsible-tree
   const createVis = async () => {
     
-    
-  // dataset = await d3.json("../datasets/phantom.json", d3.autoType )  // A surprise to be sure, but a welcome one
-  dataset = await d3.json("../datasets/astley.json", d3.autoType )   //  See https://youtu.be/dQw4w9WgXcQ
+  dataset = await d3.json("../datasets/phantom.json", d3.autoType )   // A surprise to be sure, but a welcome one
+  // dataset = await d3.json("../datasets/astley.json", d3.autoType )   //  See https://youtu.be/dQw4w9WgXcQ
   console.log(dataset);
   
   let svg = d3.select("svg#plot");
@@ -73,70 +72,417 @@
   // Make some places for nodes/links to live (and to guarantee links are always below nodes)
   let linkGroup = svg.append("g").attr("class","links")
   let nodeGroup = svg.append("g").attr("class","nodes")
-
-  // // Make a hidden SVG to use for measuring
-  // // (we'll use this in the FlexTree part of the lecture)
-  // let virtualText = d3.select("body").append("svg").attr("width",0).attr("height",0)
-  //                     .append("text").attr("class","node-label");
-  // 
-  // virtualText.text("thisisatest");
-  // console.log(virtualText.node().getComputedTextLength())
   
-  // BEGIN LECTURE
+  // d3.hierarchy will build the tree dataset from our data
+  //  it expects items to have a "children" element that contains child nodes, which the dataset already has
+  let root = d3.hierarchy(dataset);
+  
+  // root.descendants traverses through the nodes underneath the root in the tree
+  root.descendants().forEach( (d,i) => {
+    d.id = i; // give each node a unique ID for our data join as we show/hide stuff later
+    d.backupChildren = d.children; // give each node a backup pointer for its children in case we hide them
+  });
+  console.log(root);
+  
+  // Now, let's use the .children value to show and hide specific nodes
+  // For example, let's only show the first layer of nodes and hide any ones that are deeper
+  root.descendants().forEach( node => {
+    if (node.depth > 0) { node.children = null; }
+  });
+  
+  // Make a color scale to show the amount of "stuff" in a node marker
+  //    We give scaleSequential a function that takes in a number from 0 to 1
+  //    The function t => d3.interpolateYlGnBu(0.1 + 0.9*t) runs that number through the color interpolator
+  //     but the math means the colors range from 0.1 to 1.0 on the scale, so we don't get the bottom white color
+  //    The t => d3.interpolate... pattern is nice if you want to adjust how much of the color scale you use
+  let colorScale = d3.scaleSequential(t => d3.interpolateYlGnBu(0.1 + 0.9*t)).domain([1, root.data.count]);
+  
+  // We'll also make a font size function based on depth so that labels get smaller as we go deeper in the tree
+  let fontScale = d3.scaleLinear().domain([0, 5]).clamp(true).range([20,10]);
+  
+  // One complication right off the bat: what direction does our tree go?
+  // The default D3 functions (and lots of tree algorithms) assume trees go top to bottom
+  //  However, that would get clunky with text
+  // To make the tree go left to right so that text is more legible, we just need to flip the axes...
+  // In this example we'll swap X for Y throughout the code, but arguably there are more elegant ways to do this
+  // * So when you see .x(d => d.y), translate(d.y,... ) or [height, width], that's what's happening *
+  
+  // Start with some housekeeping
+  //  Build d3 structures to process the tree data 
+  //  (each node has a key "name" and a key "children" which points to a list of child nodes)
+  // let treeGen = d3.tree();
+  // treeGen.nodeSize([40,300]);     // Fixed size for nodes
   
   
   
+  //  ** Switching to FlexTree **
+  //  After lecture, I added this code to make a better layout
+  //  The intuition here is that the original tree generator assumes a FIXED SIZE for all of the nodes
+  //  This is bad for short strings, as we waste space. It's bad for long strings where we may not reserve
+  //   enough space to show it. FlexTree lets us assign a per-node size that fits the text optimally
+  //  It just requires some extra work to figure out how big a node should be
+  //     (comment out the treeGen lines above this)
+  let treeGen = d3.flextree();  
+  
+  // To make flextree work, it needs to know the exact size to allocate for each node in the tree
+  //  so we must estimate the correct size of a node label using built-in SVG functions...
+  
+  // To do so we use a sneaky trick -- we create an invisible text label so that we can measure its size
+  // It's really the only effective way of accurately estimating the eventual width of an SVG <text>
+  
+  // Make a hidden SVG to use for measuring
+  let virtualText = d3.select("body").append("svg").attr("width",0).attr("height",0)
+                      .append("text").attr("class","node-label");
+                      
+  virtualText.text("thisisatest");
+  console.log(virtualText.node().getComputedTextLength())
+                      
+  // Use the nodeSize function to supply a [width, height] array for each node in the flexTree
+  // Given a node, d, what width and height should it have so we have enough room for text?
+  let xPadding = 100
+  let yPadding = 4; //px above and below text
+  treeGen.nodeSize(node => {
+    virtualText.text(node.data.name);
+    let width = xPadding + virtualText.node().getComputedTextLength();
+    let height = fontScale(node.depth) + 2*yPadding;
+    return [height, width]; // Another place where we swap X and Y
+  });    
+  
+  // You can also use .spacing() to space the nodes out a bit better
+  treeGen.spacing(10);
+  //  ** End FlexTree changes      
+                      
+                
+  
+  // Make a link generator to connect up the nodes in the tree in a pleasing fashion
+  // Note the swap of x and y to make the tree go from left to right
+  let lineGen = d3.linkHorizontal().x(d => d.y).y(d => d.x)      
   
   
   
-  // Update function for chart so we can later trigger it during interactions
+  // Update function for chart so we can later trigger it during animations
+  // STATIC VERSION
   let updateChart = async function() {
   
+    console.log(root.descendants());
+  
+    // Get the current nodes/links for the chart and build a tree layout of them
+    let nodeDat = root.descendants();
+    let linkDat = root.links();
+    // We always recompute the tree because the nodes may have changed (i.e. the user hid child nodes)
+    let tree = treeGen(root); 
     
+    // NOTE: treeGen computes a top-down layout rather than left-right
+    //  We need to swap x and y when we use the layout in order to make it left-right
+    //  If you examine earlier code, you'll see we swap width and height and x and y
+  
+    // We'll need to adapt the height of the SVG to accommodate all of the nodes
+    //  ...but how do we find out the right height?
+    //  we can't just center it because there is no guarantee the root is in the middle in a Tidy Tree
+    //  instead, we locate the top and bottom nodes (which are left and right in d3 tree land)
+    let top = root;
+    let bottom = root;
+    root.each( node => {
+      if (node.x < top.x) {top = node};
+      if (node.x > bottom.x) {bottom = node};
+    });
+    let padding = 80
+    let height = bottom.x - top.x + padding;
+    // Now set the height of the SVG
+    svg.attr("height", height);
+  
+    // We'll also need to adjust our node and link <g> tags since the root node starts at 0,0 in the tree layout
+    //  instead of in the middle-ish like we want -- we shift the chart DOWN by top.x 
+    // (this is also another case where we swap X and Y)
+    //     (top.x is a negative number because it is ABOVE the 0,0 point )
 
+    linkGroup.attr("transform",`translate(100,${-top.x+padding/2})`)
+    nodeGroup.attr("transform",`translate(100,${-top.x+padding/2})`)
+  
+    // Now do a data join to make the nodes
+    let nodes = nodeGroup.selectAll("g.node").data(nodeDat, d => d.id)
+                         .join(
+                          enter => {
+                            // Make a group to hold the circle and text
+                            let g = enter.append("g").attr("class","node")
+  
+                            g.append("circle")
+                             .attr("r", 8)
+                             .attr("fill", d => d.backupChildren ? colorScale(d.data.count) : "#FFF")
+                             .attr("stroke", "#333")
+                             .attr("stroke-width", 2)
+  
+                            g.append("text").attr("class","node-label no-select")
+                             .attr("x", 14)
+                             .attr("text-anchor", "start")
+                             .style("font-size", d => { scale = fontScale(d.depth); return `${scale}px`})
+                             .attr("dy", d => fontScale(d.depth)/4 )
+                             .text( d => d.data.name );
+  
+                             // We'll do something clever here to make the text more legible
+                             // We add a second text element underneath the first one that has a stroke
+                             // Setting both to white, we can make an outline on the text 
+                            g.append("text").attr("class","node-shadow no-select")
+                             .attr("x", 14)
+                             .attr("text-anchor", "start")
+                             .style("font-size", d => `${fontScale(d.depth)}px`)  // technically, you should probably copy these settings from the first text label so that you don't have to change the code in two places if you need to tweak the look of the text
+                             .attr("dy", d => fontScale(d.depth)/4 )
+                             .attr("stroke","white")
+                             .attr("fill","white")
+                             .attr("stroke-width", d => fontScale(d.depth)/3)
+                             .attr("opacity",0.8)
+                             .text( d => d.data.name )
+                             .lower();   // make sure it is underneath the text
+  
+                             // Later, we can animate the positioning of the nodes
+                             g.attr("transform", d => `translate(${d.y},${d.x})`) 
+                             
+                             // Add the click call to expand and contract nodes
+                             // We do something sneaky here -- we edit the d.children element in a node
+                             //  and set it to null so that the data join doesn't show those nodes
+                             // Since we kept a backup pointer, we can bring it back to show nodes again
+                             g.style("cursor", d => d.backupChildren ? "pointer" : "auto")
+                               .on("click", function(event, d) {
+                                if (d.children) {
+                                  d.children = null;
+                                }
+                                else {
+                                  d.children = d.backupChildren;
+                                }
+                                // UpdateChart *recomputes* the layout each time, so when we call it the
+                                //  user will see a new layout incorporating the added/removed child nodes
+                                updateChart();
+                              });
+                           },
+                           update => {
+                             update.attr("transform", d => `translate(${d.y},${d.x})`);
+                           },
+                           exit => { 
+                             exit.remove(); 
+                           } )
+  
+    // Do a data join for the links
+    let links = linkGroup.selectAll("path.link").data(linkDat, d => d.target.id)
+                         .join( 
+                           enter => {
+                             enter.append("path").attr("class","link")
+                                  .attr("fill","none")
+                                  .attr("stroke","#AAA")
+                                  .attr("stroke-width",2)
+                                  .attr("d", lineGen )
+                           },
+                           update => {
+                             update.attr("d", lineGen )
+                           },
+                           exit => {
+                             exit.remove() 
+                           } );
   }
   
   updateChart();
+  // END STATIC VERSION
   
   
   
-  // // ** Add a quick "OPEN/CLOSE ALL" button for fun **
-  // // Unfortunately, tree.descendants won't work if .children is null, so we make a quick tree traversal
-  // function expand(node) {
-  //   if (node.backupChildren) {
-  //     node.children = node.backupChildren;
-  //     node.children.forEach( n2 => {
-  //       expand(n2);
-  //     })
-  //   }
+  // ** Add a quick "OPEN/CLOSE ALL" button for fun **
+  
+  // Unfortunately, tree.descendants won't work if .children is null, so we write a quick tree traversal
+  // Refer back to your data structures class if you aren't familiar with tree traversal algorithms
+  function expand(node) {
+    if (node.backupChildren) {
+      node.children = node.backupChildren;
+      node.children.forEach( n2 => {
+        expand(n2);
+      })
+    }
+  }
+  
+  // Now add a toggle-able button
+  // All this will do is access the root node and either eliminate its children to hide things,
+  //  or traverse through the tree and show all of the child nodes to open everything up
+  d3.select("#treeContainer")
+     .append("button").lower()
+     .text("OPEN ALL NODES")
+     .attr("cursor","pointer")
+     .attr("x",10)
+     .attr("y",20)
+     .attr("class","collapsed") // store state of the button as a class - a handy trick
+     .on("click", function() {
+       let e = d3.select(this);
+       if (e.classed("collapsed")) {
+         // OPEN ALL
+         expand(root);
+         updateChart(root);
+         e.text("CLOSE ALL NODES")
+          .classed("collapsed", false)
+       }
+       else {
+         // CLOSE ALL
+         root.descendants().forEach( node => {
+           if (node.depth > 0) { node.children = null; }
+         });
+         updateChart(root);
+         e.text("OPEN ALL NODES")
+          .classed("collapsed", true)
+       }
+     })
+  
+  
+  
+  // For your own edification, here is an ANIMATED VERSION of the code above
+  // We won't cover this in a lecture, but you can play with it to see how it works
+  // The trickiest bit is making the links smoothly animate, since they don't store their old positions
+  // BEGIN ANIMATED VERSION
+  // let updateChart = async function(eventNode) {
+  // 
+  //   console.log(root.descendants());
+  // 
+  //   // Get the current nodes/links for the chart and build a tree layout of them
+  //   let nodeDat = root.descendants();
+  //   let linkDat = root.links();
+  //   let tree = treeGen(root);     // This regenerates the layout if the nodes have changed
+  // 
+  //   // we'll need to adapt the height of the SVG to accommodate all of the nodes
+  //   //  ...but how do we find out the right height?
+  //   //  we can't just center it because there is no guarantee the root is in the middle in a Tidy Tree
+  //   //  instead, we locate the top and bottom nodes (which are left and right in d3 tree land)
+  //   let top = root;
+  //   let bottom = root;
+  //   root.eachBefore( node => {
+  //     if (node.x < top.x) {top = node};
+  //     if (node.x > bottom.x) {bottom = node};
+  // 
+  //   });
+  //   let height = bottom.x - top.x + 80;
+  // 
+  //   // We might want to animate this later...
+  //   svg.transition().attr("height", height);
+  // 
+  //   // We'll also need to adjust our node and link <g> tags since the root node starts at 0,0 in the tree layout
+  //   linkGroup.transition().attr("transform",`translate(100,${-top.x+40})`)
+  //   nodeGroup.transition().attr("transform",`translate(100,${-top.x+40})`)
+  // 
+  //   // Now do a data join to make the nodes
+  //   let nodes = nodeGroup.selectAll("g.node").data(nodeDat, d => d.id)
+  //                        .join(enter => {
+  //                           // Make a group to hold the circle and text
+  //                           let g = enter.append("g").attr("class","node")
+  // 
+  //                           g.append("circle")
+  //                            .attr("r", 8)
+  //                            .attr("fill", d => d.backupChildren ? colorScale(d.data.count) : "#FFF")
+  //                            .attr("stroke", "#333")
+  //                            .attr("stroke-width", 2)
+  // 
+  //                           g.append("text").attr("class","node-label no-select")
+  //                            .attr("x", 14)
+  //                            .attr("text-anchor", "start")
+  //                            .style("font-size", d => { scale = fontScale(d.depth); return `${scale}px`})
+  //                            .attr("dy", d => fontScale(d.depth)/4 )
+  //                            .text( d => d.data.name );
+  // 
+  //                            // We'll do something clever here to make the text more legible
+  //                            // We add a second text element underneath the first one that has a stroke
+  //                            // Setting both to white, we can make an outline on the text 
+  //                           g.append("text").attr("class","node-shadow no-select")
+  //                            .attr("x", 14)
+  //                            .attr("text-anchor", "start")
+  //                            .style("font-size", d => { scale = fontScale(d.depth); return `${scale}px`})
+  //                            .attr("dy", d => fontScale(d.depth)/4 )
+  //                            .attr("stroke","white")
+  //                            .attr("fill","white")
+  //                            .attr("stroke-width", d => fontScale(d.depth)/3)
+  //                            .attr("opacity",0.8)
+  //                            .text( d => d.data.name )
+  //                            .lower();       
+  // 
+  //                            // Now we animate the positioning of nodes
+  //                            // These nodes start on the node you clicked, then move to their proper position
+  //                            g.attr("transform", d => `translate(${eventNode.y},${eventNode.x})`)
+  //                             .attr("opacity",0)
+  //                             .transition()
+  //                             .attr("transform", d => `translate(${d.y},${d.x})`) 
+  //                             .attr("opacity",1)
+  // 
+  //                            // Add the click call
+  //                            g.style("cursor", d => d.backupChildren ? "pointer" : "auto")
+  //                             .on("click", function(event, d) {
+  //                              if (d.children) {
+  //                                d.children = null;
+  //                              }
+  //                              else {
+  //                                d.children = d.backupChildren;
+  //                              }
+  //                              updateChart(d);
+  //                            });
+  // 
+  //                              },
+  //                              update => {
+  //                                // We need an animation here too because the layout may shift a bit as nodes are added
+  //                                update.transition()
+  //                                      .attr("transform", d => `translate(${d.y},${d.x})`) 
+  //                                      .attr("opacity",1);
+  //                              },
+  //                              exit => { 
+  //                                // We should also have nodes shrink back into their parent to reinforce tree structure
+  //                                exit.transition().remove()
+  //                                                 .attr("transform", d => `translate(${eventNode.y},${eventNode.x})`)
+  //                                                 .attr("opacity",0); 
+  //                              } )
+  // 
+  // 
+  //   // Do a data join for the links
+  //   //  This is going to be a bit trickier because links don't store their start/end point
+  //   //  Since they only store a "d" attr, we need to track their old starting points somehow
+  //   //   so that we can make the links expand out of the node the user clicks
+  //   //  See below for .xLast and .yLast where we grab that part
+  //   let links = linkGroup.selectAll("path.link").data(linkDat, d => d.target.id)
+  //                        .join( enter => {
+  //                          let p = enter.append("path").attr("class","link")
+  //                               .attr("fill","none")
+  //                               .attr("stroke","#AAA")
+  //                               .attr("stroke-width",2)
+  // 
+  //                          // To animate, we'll start the link entirely on the node clicked
+  //                          // We do this by creating a fake node and feeding it into the link generator
+  //                          p.attr("d", d => {
+  //                              const fakeNode = {x: eventNode.xLast, y: eventNode.yLast};
+  //                              return lineGen({source: fakeNode, target: fakeNode}) 
+  //                           })
+  //                           .transition()  // Then animate to proper layout
+  //                           .attr("d", lineGen)
+  //                               },
+  //                               update => {
+  //                                 // Links may shift a bit due to changes elsewhere, so animate their update
+  //                                 update.transition().attr("d", d => lineGen(d) )
+  //                               },
+  //                               exit => {
+  //                                 // We will have nodes shrink back down into what was clicked
+  //                                 // As this is the inverse of enter, we do the same virtual node trick
+  //                                 exit.transition()
+  //                                 .attr("d", d => {
+  //                                   const fakeNode = {x: eventNode.x, y: eventNode.y};
+  //                                   return lineGen({source: fakeNode, target: fakeNode}) 
+  //                                 })
+  //                                 .remove() 
+  //                               } );
+  // 
+  // 
+  //   // Store last positions in case we need them when animating
+  //   root.eachBefore( node => {
+  //     node.xLast = node.x;
+  //     node.yLast = node.y;
+  //   });                                        
+  // 
+  // 
   // }
-  // // Now add a toggle-able button
-  // d3.select("#treeContainer")
-  //    .append("button").lower()
-  //    .text("OPEN ALL NODES")
-  //    .attr("cursor","pointer")
-  //    .attr("x",10)
-  //    .attr("y",20)
-  //    .attr("class","collapsed") // store state as a class
-  //    .on("click", function() {
-  //      let e = d3.select(this);
-  //      if (e.classed("collapsed")) {
-  //        // OPEN ALL
-  //        expand(root);
-  //        updateChart(root);
-  //        e.text("CLOSE ALL NODES")
-  //         .classed("collapsed", false)
-  //      }
-  //      else {
-  //        // CLOSE ALL
-  //        root.descendants().forEach( node => {
-  //          if (node.depth > 0) { node.children = null; }
-  //        });
-  //        updateChart(root);
-  //        e.text("OPEN ALL NODES")
-  //         .classed("collapsed", true)
-  //      }
-  //    })
+  // 
+  // // Because we use xLast and yLast in the animated updateChart, we need to prime them before we call updateChart
+  // root.xLast = 0;
+  // root.yLast = 0;
+  // 
+  // updateChart(root);
+  // // END ANIMATED VERSION
   
   
   }
